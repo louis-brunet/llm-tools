@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "main": "build/index.js",
   "scripts": {
+    "lint": "yarn eslint \"{src,tests?}/**/*.ts\" --fix",
     "build": "yarn tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

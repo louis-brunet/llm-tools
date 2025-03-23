@@ -11,7 +11,7 @@ export type LlmToolsClientConfig =
   | LlmToolsClientConfigLlamaCpp
   | LlmToolsClientConfigOllama;
 
-// export type LlmToolsBackendType = LlmToolsClientConfig['backend'];
+export type LlmToolsBackendType = LlmToolsClientConfig['backend'];
 
 export interface ILlmToolsInfillRequestExtraContext {
   fileName: string;
@@ -41,6 +41,7 @@ export interface ILlmToolsCliCompletionRequestHistoryItem {
 export interface ILlmToolsCliCompletionRequest {
   promptPrefix: string;
   promptSuffix: string;
+  shell: string;
   history: ILlmToolsCliCompletionRequestHistoryItem[];
   project: {
     path: string;

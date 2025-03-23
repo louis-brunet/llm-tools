@@ -1193,9 +1193,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@llm-tools/cli@workspace:packages/apps/cli-completions":
+"@llm-tools/cli@workspace:packages/apps/cli":
   version: 0.0.0-use.local
-  resolution: "@llm-tools/cli@workspace:packages/apps/cli-completions"
+  resolution: "@llm-tools/cli@workspace:packages/apps/cli"
   dependencies:
     "@commander-js/extra-typings": "npm:^13.1.0"
     "@eslint/js": "npm:^9.22.0"
@@ -1210,7 +1210,7 @@ __metadata:
     typescript: "npm:^5.8.2"
     typescript-eslint: "npm:^8.26.1"
   bin:
-    cli: build/main.js
+    cli: ./build/main.js
   languageName: unknown
   linkType: soft
 
@@ -1232,9 +1232,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@llm-tools/server@workspace:packages/apps/cli-completions-server":
+"@llm-tools/server@workspace:packages/apps/server":
   version: 0.0.0-use.local
-  resolution: "@llm-tools/server@workspace:packages/apps/cli-completions-server"
+  resolution: "@llm-tools/server@workspace:packages/apps/server"
   dependencies:
     "@eslint/eslintrc": "npm:^3.2.0"
     "@eslint/js": "npm:^9.18.0"

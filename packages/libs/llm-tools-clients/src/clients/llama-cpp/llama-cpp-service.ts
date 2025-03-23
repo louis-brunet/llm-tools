@@ -13,6 +13,7 @@ import {
 } from './types';
 
 interface ILlmToolsManualInfillRequest extends ILlmToolsInfillRequest {
+  system?: string | undefined;
   repoName: string;
   currentFileName: string;
 }
@@ -34,10 +35,12 @@ export class LlamaCppService implements ILlmToolsService {
   async cliCompletion(request: ILlmToolsCliCompletionRequest): Promise<string> {
     const response = await this.manualInfill({
       repoName: request.project.path,
-      currentFileName: 'command-to-complete.zsh',
+      currentFileName: `command-to-complete.${request.shell}`,
       inputPrefix: request.promptPrefix,
       inputSuffix: request.promptSuffix,
       prompt: '',
+      system: `You must complete the current command line using valid ${request.shell} syntax. The command should be a single line.`,
+      singleLine: true,
       inputExtra: [
         ...request.project.files.map((file) => ({ fileName: file, text: '' })),
         {
@@ -48,7 +51,6 @@ export class LlamaCppService implements ILlmToolsService {
           ),
         },
       ],
-      singleLine: true,
     });
     return response.content;
 
@@ -101,8 +103,8 @@ export class LlamaCppService implements ILlmToolsService {
     // <FIM_SEP>filename
     // <FIM_PRE>[input_prefix]<FIM_SUF>[input_suffix]<FIM_MID>[prompt]
 
-    const shellName = 'zsh';
-    const currentFileName = `current-command.${shellName}`;
+    // const shellName = 'zsh';
+    // const currentFileName = `current-command.${shellName}`;
     let prompt = //'Use the following context (working directory, files, recent shell command history) to complete the current command line.\n' +
       `${fimTokens.repo}${request.repoName}\n` +
       (request.inputExtra?.reduce((previous, file) => {
@@ -111,17 +113,22 @@ export class LlamaCppService implements ILlmToolsService {
           ? `${file.text}\n`
           : '';
       }, '') ?? '') +
-      `${fimTokens.fileSeparator}${currentFileName}\n` +
+      `${fimTokens.fileSeparator}${request.currentFileName}\n` +
       `${fimTokens.prefix}${request.inputPrefix}${fimTokens.suffix}${request.inputSuffix}${fimTokens.middle}`;
 
     const stop = [];
     if (request.singleLine) {
       stop.push('\n');
-      prompt = `You must complete the current command line using valid ${shellName} syntax. The command should be a single line.\n${prompt}`;
+      // prompt = `You must complete the current command line using valid ${shellName} syntax. The command should be a single line.\n${prompt}`;
     }
     if (request.inputSuffix.trim()) {
       stop.push(request.inputSuffix);
     }
+
+    if (request.system) {
+      prompt = `${request.system}\n${prompt}`;
+    }
+
     const response = await this.client.completion({
       prompt,
       temperature: 0.2,

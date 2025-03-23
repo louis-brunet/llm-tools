@@ -1,8 +1,11 @@
 #!/usr/bin/env zsh
 
-LLM_TOOLS_CLI_COMPLETIONS_COMMAND="${LLM_TOOLS_CLI_COMPLETIONS_COMMAND:-$PROJECTS/llm-tools/packages/apps/cli-completions/build/main.js}"
+_script_path=$(realpath "$0")
+_script_dir=$(dirname "$_script_path")
 
 function llm-completion-widget() {
+  local LLM_TOOLS_CLI_COMPLETION_COMMAND="${LLM_TOOLS_CLI_COMPLETION_COMMAND:-$_script_dir/../../build/main.js}"
+
   # Get text from current cursor position to beginning of line
   local prefix=${BUFFER[1, $CURSOR]}
 
@@ -21,7 +24,7 @@ function llm-completion-widget() {
   local history_args=("${(@f)$(fc -ln -15)}")
   # --debug \
   local suggestion=$(
-    "$LLM_TOOLS_CLI_COMPLETIONS_COMMAND" \
+    "$LLM_TOOLS_CLI_COMPLETION_COMMAND" \
       cli-completion \
       --prefix "$prefix" \
       --suffix "$suffix" \
@@ -31,7 +34,6 @@ function llm-completion-widget() {
   )
 
   LBUFFER+="$suggestion"
-
 }
 
 function _configure-llm-tools-completion() {
@@ -44,7 +46,7 @@ function _configure-llm-tools-completion() {
 
   # Print instructions
   echo "Widget '$_widget' defined. Press $_widget_keybind to trigger completions."
-  echo "Run 'source $(realpath "$0")' in your terminal to apply in current session."
+  echo "Run 'source $_script_path' in your terminal to apply in current session."
 }
 
 _configure-llm-tools-completion
