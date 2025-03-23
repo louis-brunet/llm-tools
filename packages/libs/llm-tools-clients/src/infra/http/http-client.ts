@@ -1,7 +1,3 @@
-import {
-  completionStreamEndResponseSchema,
-  completionStreamResponseSchema,
-} from '../../clients/llama-cpp/schemas';
 import { HttpError } from './error';
 
 export interface IHttpClient {
@@ -17,30 +13,6 @@ export interface IHttpClient {
     options?: { headers?: Record<string, string> },
   ): AsyncGenerator<string, void, unknown>;
 }
-
-// async function fetchTextAsStream(url: string) {
-//   try {
-//     const response = await fetch(url);
-//     // if (!response.ok) {
-//     //   throw new Error(`Response status: ${response.status}`);
-//     // }
-//
-//     if (response.body) {
-//       // const stream = response.body
-//       // const stream: NodeJS.ReadableStream = response.body
-//       // .pipeThrough(
-//       //   new TextDecoderStream(),
-//       // );
-//       // const stream = response.body.pipeThrough(new TextDecoderStream());
-//       const stream = response.body;
-//       for await (const value of stream) {
-//         console.log(value);
-//       }
-//     }
-//   } catch (e) {
-//     console.error(e);
-//   }
-// }
 
 export class HttpClient implements IHttpClient {
   async get(url: string): Promise<unknown> {

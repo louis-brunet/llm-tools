@@ -1,4 +1,4 @@
-import {
+import type {
   ILlmToolsCliCompletionRequest,
   ILlmToolsInfillRequest,
   ILlmToolsInfillResponse,
@@ -6,7 +6,7 @@ import {
   LlmToolsClientConfigLlamaCpp,
 } from '../types';
 import { LlamaCppClient } from './llama-cpp-client';
-import {
+import type {
   ILlamaCppInfillRequest,
   LlamaCppCompletionResponse,
   LlamaCppInfillResponse,
@@ -108,10 +108,10 @@ export class LlamaCppService implements ILlmToolsService {
     let prompt = //'Use the following context (working directory, files, recent shell command history) to complete the current command line.\n' +
       `${fimTokens.repo}${request.repoName}\n` +
       (request.inputExtra?.reduce((previous, file) => {
-        return `${previous}${fimTokens.fileSeparator}${file.fileName}\n` +
-          file.text
-          ? `${file.text}\n`
-          : '';
+        return (
+          `${previous}${fimTokens.fileSeparator}${file.fileName}\n` +
+          (file.text ? `${file.text}\n` : '')
+        );
       }, '') ?? '') +
       `${fimTokens.fileSeparator}${request.currentFileName}\n` +
       `${fimTokens.prefix}${request.inputPrefix}${fimTokens.suffix}${request.inputSuffix}${fimTokens.middle}`;

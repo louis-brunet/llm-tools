@@ -1,3 +1,4 @@
+import { ValidationError } from 'yup';
 import { HttpClient, IHttpClient } from '../../infra';
 import { ILlmToolsClient } from '../types';
 import {
@@ -30,7 +31,7 @@ export class LlamaCppClient
       ILlamaCppCompletionNoStreamRequest,
       LlamaCppCompletionNoStreamResponse,
       ILlamaCppCompletionStreamRequest,
-      LlamaCppCompletionStreamResponse
+      LlamaCppCompletionStreamResponse | LlamaCppCompletionStreamEndResponse
     >
 {
   private readonly httpClient: IHttpClient;
@@ -79,20 +80,23 @@ export class LlamaCppClient
       request,
     );
     for await (const responseChunk of stream) {
-      const streamResponse = completionStreamResponseSchema.validateSync(
-        responseChunk,
-        {
-          stripUnknown: false,
-        },
-      );
-      if (streamResponse.stop) {
-        const streamEndResponse =
-          completionStreamEndResponseSchema.validateSync(responseChunk, {
+      const jsonResponseChunk: unknown = JSON.parse(responseChunk);
+      try {
+        const streamResponse = completionStreamResponseSchema.validateSync(
+          jsonResponseChunk,
+          {
             stripUnknown: false,
-          });
-        yield streamEndResponse;
-      } else {
+          },
+        );
         yield streamResponse;
+      } catch (e) {
+        if (e instanceof ValidationError) {
+          const streamEndResponse =
+            completionStreamEndResponseSchema.validateSync(jsonResponseChunk, {
+              stripUnknown: false,
+            });
+          yield streamEndResponse;
+        }
       }
     }
   }

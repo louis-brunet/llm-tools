@@ -16,7 +16,7 @@ export interface ILlamaCppInfillRequestExtraContext {
 }
 
 /** https://github.com/ggml-org/llama.cpp/blob/master/examples/server/README.md#post-infill-for-code-infilling */
-export interface ILlamaCppInfillRequest {
+export interface ILlamaCppInfillRequest extends ILlamaCppCompletionRequest {
   /** Set the prefix of the code to infill. */
   input_prefix: string;
 
@@ -29,8 +29,8 @@ export interface ILlamaCppInfillRequest {
    */
   input_extra?: ILlamaCppInfillRequestExtraContext[] | undefined;
 
-  /** Added after the FIM_MID token */
-  prompt?: string | undefined;
+  // /** Added after the FIM_MID token */
+  // prompt?: string | undefined;
 }
 export type LlamaCppInfillResponse = InferType<typeof infillResponseSchema>;
 
