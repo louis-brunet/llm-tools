@@ -34,18 +34,10 @@ export class LlamaCppService implements ILlmToolsService {
   async cliCompletion(request: ILlmToolsCliCompletionRequest): Promise<string> {
     const response = await this.manualInfill({
       repoName: request.project.path,
-      // currentFileName: 'command-history.zsh',
       currentFileName: 'command-to-complete.zsh',
       inputPrefix: request.promptPrefix,
-      // inputPrefix: request.history.reduce((previous, historyItem) => {
-      //   return `${previous}${historyItem.command}\n`
-      // }, '') + request.promptPrefix,
       inputSuffix: request.promptSuffix,
       prompt: '',
-      // prompt: request.promptPrefix,
-      // inputExtra:
-      //   request.project.files.map((file) => ({ fileName: file, text: '' })),
-      // ,
       inputExtra: [
         ...request.project.files.map((file) => ({ fileName: file, text: '' })),
         {
@@ -57,9 +49,6 @@ export class LlamaCppService implements ILlmToolsService {
         },
       ],
       singleLine: true,
-      // inputExtra: request.project.files.reduce((previous, file) => {
-      //   return `${previous}${fimTokens.fileSeparator}${file}\n`
-      // }, ''),
     });
     return response.content;
 

@@ -6,7 +6,7 @@
     "packages/libs/*"
   ],
   "scripts": {
-    "build:server": "yarn workspaces foreach --recursive --topological-dev --from=cli-completions-server run build",
+    "build:server": "yarn workspaces foreach --recursive --topological-dev --from=@llm-tools/server run build",
     "build:cli": "yarn workspaces foreach --recursive --topological-dev --from=@llm-tools/cli run build",
     "test": "yarn workspaces foreach --recursive --topological-dev --from='packages/apps/*' run test"
   },
