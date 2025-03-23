@@ -42,6 +42,7 @@ export class LlamaCppClient
     this.httpClient = httpClient || new HttpClient();
   }
 
+  /** https://github.com/ggml-org/llama.cpp/blob/master/examples/server/README.md#post-infill-for-code-infilling */
   async infill(
     request: ILlamaCppInfillRequest,
   ): Promise<LlamaCppInfillResponse> {
@@ -65,6 +66,7 @@ export class LlamaCppClient
     });
   }
 
+  /** https://github.com/ggml-org/llama.cpp/blob/master/examples/server/README.md#post-completion-given-a-prompt-it-returns-the-predicted-completion */
   async *completionStream(
     request: ILlamaCppCompletionStreamRequest,
   ): AsyncGenerator<

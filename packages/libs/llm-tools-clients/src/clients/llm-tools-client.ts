@@ -1,22 +1,22 @@
-import { LlamaCppClientAdapter } from './llama-cpp';
+import { LlamaCppService } from './llama-cpp';
 import {
   ILlmToolsCliCompletionRequest,
-  ILlmToolsClientAdapter,
+  ILlmToolsService,
   ILlmToolsInfillRequest,
   ILlmToolsInfillResponse,
   LlmToolsClientConfig,
 } from './types';
 
-export class LlmToolsClient implements ILlmToolsClientAdapter {
-  private readonly client: ILlmToolsClientAdapter;
+export class LlmToolsService implements ILlmToolsService {
+  private readonly client: ILlmToolsService;
 
   constructor(clientConfig: LlmToolsClientConfig) {
-    switch (clientConfig.type) {
+    switch (clientConfig.backend) {
       case 'llama-cpp':
-        this.client = new LlamaCppClientAdapter(clientConfig);
+        this.client = new LlamaCppService(clientConfig);
         break;
       default:
-        throw new Error(`Unsupported client type: ${clientConfig.type}`);
+        throw new Error(`Backend not implemented: ${clientConfig.backend}`);
     }
   }
 

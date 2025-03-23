@@ -1,8 +1,8 @@
 import { Command } from '@commander-js/extra-typings';
 import {
   ILlmToolsInfillRequestExtraContext,
-  LlmToolsClient,
-} from 'llm-tools-clients';
+  LlmToolsService,
+} from '@llm-tools/clients';
 import { ProgramOptions } from '../cli';
 
 export const infillCommand = new Command()
@@ -37,8 +37,8 @@ async function infill(
   try {
     // Initialize client
     // const client = new LlamaCppClient({ serverOrigin: options.server });
-    const client = new LlmToolsClient({
-      type: 'llama-cpp',
+    const client = new LlmToolsService({
+      backend: 'llama-cpp',
       serverOrigin: infillOptions.server,
     });
 

@@ -1,6 +1,6 @@
 import { Command, Option } from '@commander-js/extra-typings';
 import { infillCommand } from './commands/infill';
-import { completionCommand } from './commands/completion';
+import { cliCompletionCommand } from './commands/cli-completion';
 
 export const ENV_VAR_PREFIX = 'LLM_TOOLS';
 
@@ -14,7 +14,7 @@ const program = new Command()
       .env(`${ENV_VAR_PREFIX}_DEBUG`),
   )
   .addCommand(infillCommand)
-  .addCommand(completionCommand);
+  .addCommand(cliCompletionCommand);
 //   .addHelpText(
 //     'after',
 //     ''

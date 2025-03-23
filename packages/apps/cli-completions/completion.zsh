@@ -9,43 +9,26 @@ function llm-completion-widget() {
   # Get text from cursor position to end of line (suffix)
   local suffix=${BUFFER[$CURSOR + 1, -1]}
 
-  local RECENT_COMMAND_COUNT=15
-  local extra_context=(
-    # "CONTEXT.zsh:working_dir=$(pwd)\nfiles=$(echo *)"
-    "CONTEXT.zsh:pwd\n# $(pwd)\nls\n# $(echo *)"
-    ".histfile:$(fc -ln "-$RECENT_COMMAND_COUNT")"
-  )
-  local suggestion=$("$LLM_TOOLS_CLI_COMPLETIONS_COMMAND" infill --prefix "$prefix" --suffix "$suffix" --multi-line --extra "${extra_context[@]}")
-
-  # local files_args=("${(@f)$(find . -maxdepth 1 -type f -o -type d | grep -v "^\.$" | sed 's:^./::' | sort)}")
-  #
-  # # fc -ln -15 | xargs echo "RUNNING COMMAND: " "$LLM_TOOLS_CLI_COMPLETIONS_COMMAND" \
-  # #     completion \
-  # #     --prefix "$prefix" \
-  # #     --working-directory "$(pwd)" \
-  # #     --files "${files_args[@]}" \
-  # #     --history
-  #
-  # local history_args=("${(@f)$(fc -ln -15)}")
-  #
-  # # echo "RUNNING COMMAND: " "$LLM_TOOLS_CLI_COMPLETIONS_COMMAND" \
-  # #     completion \
-  # #     --debug \
-  # #     --prefix "$prefix" \
-  # #     --working-directory "$(pwd)" \
-  # #     --files "${files_args[@]}" \
-  # #     --history "${history_args[@]}"
-  #
-  # local suggestion=$(
-  #   "$LLM_TOOLS_CLI_COMPLETIONS_COMMAND" \
-  #     completion \
-  #     --debug \
-  #     --prefix "$prefix" \
-  #     --working-directory "$(pwd)" \
-  #     --files "${files_args[@]}" \
-  #     --history "${history_args[@]}"
+  # local RECENT_COMMAND_COUNT=15
+  # local extra_context=(
+  #   # "CONTEXT.zsh:working_dir=$(pwd)\nfiles=$(echo *)"
+  #   "CONTEXT.zsh:pwd\n# $(pwd)\nls\n# $(echo *)"
+  #   ".histfile:$(fc -ln "-$RECENT_COMMAND_COUNT")"
   # )
-  # # --files $(find . -maxdepth 1 -type f -o -type d | grep -v "^\.$" | sed 's:^./::' | sort) \
+  # local suggestion=$("$LLM_TOOLS_CLI_COMPLETIONS_COMMAND" infill --prefix "$prefix" --suffix "$suffix" --multi-line --extra "${extra_context[@]}")
+
+  local files_args=("${(@f)$(find . -maxdepth 1 -type f -o -type d | grep -v "^\.$" | sed 's:^./::' | sort)}")
+  local history_args=("${(@f)$(fc -ln -15)}")
+  # --debug \
+  local suggestion=$(
+    "$LLM_TOOLS_CLI_COMPLETIONS_COMMAND" \
+      cli-completion \
+      --prefix "$prefix" \
+      --suffix "$suffix" \
+      --working-directory "$(pwd)" \
+      --files "${files_args[@]}" \
+      --history "${history_args[@]}"
+  )
 
   LBUFFER+="$suggestion"
 

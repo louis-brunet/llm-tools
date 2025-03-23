@@ -1,19 +1,17 @@
-// export enum LlmToolsClientType {
-//   LLAMA_CPP = 'llama-cpp',
-// }
-
 export type LlmToolsClientConfigLlamaCpp = {
-  type: 'llama-cpp';
+  backend: 'llama-cpp';
   serverOrigin: string;
 };
 
 export type LlmToolsClientConfigOllama = {
-  type: 'ollama';
+  backend: 'ollama';
 };
 
 export type LlmToolsClientConfig =
   | LlmToolsClientConfigLlamaCpp
   | LlmToolsClientConfigOllama;
+
+// export type LlmToolsBackendType = LlmToolsClientConfig['backend'];
 
 export interface ILlmToolsInfillRequestExtraContext {
   fileName: string;
@@ -26,6 +24,7 @@ export interface ILlmToolsInfillRequest {
   prompt: string;
   inputSuffix: string;
   inputExtra?: Array<ILlmToolsInfillRequestExtraContext> | undefined;
+  singleLine?: boolean | undefined;
 }
 
 export interface ILlmToolsInfillResponse {
@@ -41,7 +40,7 @@ export interface ILlmToolsCliCompletionRequestHistoryItem {
 
 export interface ILlmToolsCliCompletionRequest {
   promptPrefix: string;
-  // promptSuffix: string;
+  promptSuffix: string;
   history: ILlmToolsCliCompletionRequestHistoryItem[];
   project: {
     path: string;
@@ -64,24 +63,24 @@ export interface ILlmToolsClient<
   ): AsyncGenerator<ICompletionStreamResponse>;
 }
 
-export interface ILlmToolsClientAdapter {
+export interface ILlmToolsService {
   infill(request: ILlmToolsInfillRequest): Promise<ILlmToolsInfillResponse>;
   cliCompletion(request: ILlmToolsCliCompletionRequest): Promise<string>;
 }
 
-export interface ILlmToolsClientMapper<
-  IInfillRequest,
-  IInfillResponse,
-  ICompletionRequest,
-  ICompletionResponse,
-  // ICompletionStreamRequest,
-  // ICompletionStreamResponse,
-> {
-  mapInfillRequest(request: ILlmToolsInfillRequest): IInfillRequest;
-  mapInfillResponse(response: IInfillResponse): ILlmToolsInfillResponse;
-
-  mapCliCompletionRequest(
-    request: ILlmToolsCliCompletionRequest,
-  ): ICompletionRequest;
-  mapCliCompletionResponse(response: ICompletionResponse): string;
-}
+// export interface ILlmToolsClientMapper<
+//   IInfillRequest,
+//   IInfillResponse,
+//   ICompletionRequest,
+//   ICompletionResponse,
+//   // ICompletionStreamRequest,
+//   // ICompletionStreamResponse,
+// > {
+//   mapInfillRequest(request: ILlmToolsInfillRequest): IInfillRequest;
+//   mapInfillResponse(response: IInfillResponse): ILlmToolsInfillResponse;
+//
+//   mapCliCompletionRequest(
+//     request: ILlmToolsCliCompletionRequest,
+//   ): ICompletionRequest;
+//   mapCliCompletionResponse(response: ICompletionResponse): string;
+// }
