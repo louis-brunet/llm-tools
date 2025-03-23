@@ -1207,6 +1207,7 @@ __metadata:
     eslint-plugin-prettier: "npm:^5.2.3"
     globals: "npm:^16.0.0"
     prettier: "npm:^3.5.3"
+    ts-node: "npm:^10.9.2"
     typescript: "npm:^5.8.2"
     typescript-eslint: "npm:^8.26.1"
   bin:

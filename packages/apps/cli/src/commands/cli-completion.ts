@@ -1,8 +1,11 @@
 import { Command, Option } from '@commander-js/extra-typings';
-import { LlmToolsBackendType, LlmToolsClientConfig, LlmToolsService } from '@llm-tools/clients';
+import {
+  LlmToolsBackendType,
+  LlmToolsClientConfig,
+  LlmToolsService,
+} from '@llm-tools/clients';
 import { ProgramOptions } from '../cli';
 import { ENVIRONMENT_CONFIG } from '../config';
-import { request } from 'http';
 
 const ENV_PREFIX = ENVIRONMENT_CONFIG.prefix.cliCompletion;
 export const cliCompletionCommand = new Command()

@@ -11,11 +11,11 @@ export const infillCommand = new Command()
   .option('-p, --prefix <text>', 'Input prefix text', '')
   .option('-x, --suffix <text>', 'Input suffix text', '')
   .option('-t, --prompt <text>', 'Prompt text', '')
-  .option('-e, --extra <filename:content...>', 'Extra context', '')
+  .option('-e, --extra <filename:content...>', 'Extra context', [] as string[])
   .option('--multi-line', 'Enable returning multiple lines', false)
   .action(infillCommandAction);
 
-type InfillCommandOptions = ReturnType<typeof infillCommand.opts>;
+export type InfillCommandOptions = ReturnType<typeof infillCommand.opts>;
 type InfillCommand = typeof infillCommand;
 
 async function infillCommandAction(
@@ -24,84 +24,65 @@ async function infillCommandAction(
 ) {
   const optsWithGlobals: ProgramOptions & InfillCommandOptions =
     command.optsWithGlobals();
-  await infill(infillOptions, optsWithGlobals);
+  const result = await infill(infillOptions, optsWithGlobals);
+  process.stdout.write(result);
 }
 
-async function infill(
+export async function infill(
   infillOptions: InfillCommandOptions,
   globalOptions?: { debug?: boolean },
-) {
+): Promise<string> {
   if (globalOptions?.debug) {
-    console.log('Infill options: ', infillOptions);
+    console.debug('Infill options: ', infillOptions);
   }
-  try {
-    // Initialize client
-    // const client = new LlamaCppClient({ serverOrigin: options.server });
-    const client = new LlmToolsService({
-      backend: 'llama-cpp',
-      serverOrigin: infillOptions.server,
-    });
+  // try {
+  // Initialize client
+  const client = new LlmToolsService({
+    backend: 'llama-cpp',
+    serverOrigin: infillOptions.server,
+  });
 
-    // Validate required inputs
-    // if (!options.prefix && !options.suffix) {
-    //   console.error(
-    //     'Error: At least one of --prefix or --suffix must be provided',
-    //   );
-    //   program.help();
-    //   process.exit(1);
-    // }
-
-    // let extraContext: ILlamaCppInfillRequestExtraContext[] | undefined =
-    let extraContext: ILlmToolsInfillRequestExtraContext[] | undefined =
-      undefined;
-    if (
-      infillOptions.extra &&
-      Array.isArray(infillOptions.extra) &&
-      infillOptions.extra.length > 0
-    ) {
-      const separator = ':';
-      extraContext = [];
-      for (const extraItem of infillOptions.extra) {
-        const separatorIndex = extraItem.indexOf(separator);
-        if (separatorIndex === -1) {
-          console.error(`Invalid extra context format: ${extraItem}`);
-          process.exit(1);
-        }
-        const fileName = extraItem.substring(0, separatorIndex);
-        const text = extraItem.substring(separatorIndex + 1);
-        if (text) {
-          extraContext.push({
-            fileName,
-            text,
-          });
-        }
+  let extraContext: ILlmToolsInfillRequestExtraContext[] | undefined =
+    undefined;
+  if (infillOptions.extra.length > 0) {
+    const separator = ':';
+    extraContext = [];
+    for (const extraItem of infillOptions.extra) {
+      const separatorIndex = extraItem.indexOf(separator);
+      if (separatorIndex === -1) {
+        throw new TypeError(`invalid extra context format: ${extraItem}`);
+      }
+      const fileName = extraItem.substring(0, separatorIndex);
+      const text = extraItem.substring(separatorIndex + 1);
+      if (text) {
+        extraContext.push({
+          fileName,
+          text,
+        });
       }
     }
-
-    // Make the request
-    const response = await client.infill({
-      inputPrefix: infillOptions.prefix,
-      prompt: infillOptions.prompt,
-      inputSuffix: infillOptions.suffix,
-      inputExtra: extraContext,
-    });
-    // const response = await client.infill({
-    //   input_prefix: options.prefix,
-    //   prompt: options.prompt,
-    //   input_suffix: options.suffix,
-    //   input_extra: extraContext,
-    // });
-    let result = response.content;
-
-    if (!infillOptions.multiLine) {
-      const newlineIndex = result.indexOf('\n');
-      if (newlineIndex >= 0) {
-        result = result.substring(0, newlineIndex);
-      }
-    }
-    process.stdout.write(result);
-  } catch (error) {
-    console.error('Error:', (error as { message?: unknown }).message || error);
-    process.exit(1);
   }
+
+  // Make the request
+  const response = await client.infill({
+    inputPrefix: infillOptions.prefix,
+    prompt: infillOptions.prompt,
+    inputSuffix: infillOptions.suffix,
+    inputExtra: extraContext,
+  });
+  let result = response.content;
+
+  // TODO: this should be done with an array of stop strings in the request
+  if (!infillOptions.multiLine) {
+    const newlineIndex = result.indexOf('\n');
+    if (newlineIndex >= 0) {
+      result = result.substring(0, newlineIndex);
+    }
+  }
+  return result;
+  // process.stdout.write(result);
+  // } catch (error) {
+  //   console.error('Error:', (error as { message?: unknown }).message || error);
+  //   process.exit(1);
+  // }
 }

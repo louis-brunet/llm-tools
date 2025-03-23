@@ -4,9 +4,11 @@
   "bin": "./build/main.js",
   "scripts": {
     "lint": "yarn eslint \"{src,tests?}/**/*.ts\" --fix",
-    "build": "yarn tsc && chmod u+x build/main.js",
+    "build": "yarn tsc --project tsconfig.build.json && chmod u+x build/main.js",
     "start:cli": "./build/main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "yarn run test:_base '{src,tests?}/**/*.test.{js,ts}'",
+    "test:debug": "yarn run test:_base --inspect '{src,tests?}/**/*.test.{js,ts}'",
+    "test:_base": "TS_NODE_PROJECT=tsconfig.test.json node --experimental-test-coverage --test-coverage-include='src/**/*' --test-coverage-exclude='**/*.test.{js,ts}' --test-coverage-branches=80 --test-coverage-lines=60 --enable-source-maps --require ts-node/register --test"
   },
   "author": "Louis Brunet",
   "license": "MIT",
@@ -24,6 +26,7 @@
     "eslint-plugin-prettier": "^5.2.3",
     "globals": "^16.0.0",
     "prettier": "^3.5.3",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.26.1"
   },
