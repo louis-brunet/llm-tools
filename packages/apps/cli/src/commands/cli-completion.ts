@@ -14,8 +14,13 @@ export const cliCompletionCommand = new Command()
   .option('-p, --prefix <text>', 'Input prefix text', '')
   .option('-x, --suffix <text>', 'Input suffix text', '')
   .option(
-    '-h, --history <command...>',
+    '--recent-history <command...>',
     'Recent command-line history',
+    [] as string[],
+  )
+  .option(
+    '--matched-history <command...>',
+    'Command-line history matching the given prefix and suffix',
     [] as string[],
   )
   .option('-f, --files <file...>', 'Relevant file names', [] as string[])
@@ -37,7 +42,9 @@ export const cliCompletionCommand = new Command()
   )
   .action(cliCompletionCommandAction);
 
-type CliCompletionCommandOptions = ReturnType<typeof cliCompletionCommand.opts>;
+export type CliCompletionCommandOptions = ReturnType<
+  typeof cliCompletionCommand.opts
+>;
 type CliCompletionCommand = typeof cliCompletionCommand;
 
 async function cliCompletionCommandAction(
@@ -49,7 +56,7 @@ async function cliCompletionCommandAction(
   await cliCompletion(completionOptions, optsWithGlobals);
 }
 
-async function cliCompletion(
+export async function cliCompletion(
   completionOptions: CliCompletionCommandOptions,
   globalOptions?: { debug?: boolean },
 ) {
@@ -70,15 +77,17 @@ async function cliCompletion(
         throw new Error('Ollama backend not implemented yet');
     }
     const client = new LlmToolsService(backendConfig);
-    const history = Array.isArray(completionOptions.history)
-      ? completionOptions.history.map((command) => ({
-          command,
-        }))
-      : [];
+    const history = completionOptions.recentHistory.map((command) => ({
+      command,
+    }));
+    const matchedHistory = completionOptions.matchedHistory.map((command) => ({
+      command,
+    }));
     const response = await client.cliCompletion({
       promptPrefix: completionOptions.prefix,
       promptSuffix: completionOptions.suffix,
       history,
+      matchedHistory,
       shell: completionOptions.shell,
       project: {
         path: completionOptions.workingDirectory,
@@ -89,6 +98,5 @@ async function cliCompletion(
   } catch (error) {
     console.error('Error:', (error as { message?: unknown }).message || error);
     throw error;
-    // process.exit(1);
   }
 }

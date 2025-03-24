@@ -45,7 +45,7 @@ export class LlamaCppService implements ILlmToolsService {
         ...request.project.files.map((file) => ({ fileName: file, text: '' })),
         {
           fileName: '.histfile',
-          text: request.history.reduce(
+          text: [...request.matchedHistory, ...request.history].reduce(
             (previous, historyItem) => `${previous}${historyItem.command}\n`,
             '',
           ),

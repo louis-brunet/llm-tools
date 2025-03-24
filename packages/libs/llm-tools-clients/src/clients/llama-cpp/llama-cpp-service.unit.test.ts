@@ -61,6 +61,10 @@ void describe('LlamaCppService', async () => {
           { command: 'history command1' },
           { command: 'history command2' },
         ],
+        matchedHistory: [
+          { command: 'matched command1' },
+          { command: 'matched command2' },
+        ],
         project: {
           path: 'path',
           files: ['some-file.ts'],
@@ -94,11 +98,12 @@ void describe('LlamaCppService', async () => {
         ),
       );
       t.assert.match(completionPrompt, new RegExp(cliCompletionRequest.shell));
-      for (const historyCommand of cliCompletionRequest.history) {
-        t.assert.match(completionPrompt, new RegExp(historyCommand.command));
-      }
-      for (const projectFile of cliCompletionRequest.project.files) {
-        t.assert.match(completionPrompt, new RegExp(projectFile));
+      for (const matchingString of [
+        ...cliCompletionRequest.history.map((h) => h.command),
+        ...cliCompletionRequest.matchedHistory.map((h) => h.command),
+        ...cliCompletionRequest.project.files,
+      ]) {
+        t.assert.match(completionPrompt, new RegExp(matchingString));
       }
     });
   });

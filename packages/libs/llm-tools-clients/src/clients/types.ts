@@ -43,6 +43,7 @@ export interface ILlmToolsCliCompletionRequest {
   promptSuffix: string;
   shell: string;
   history: ILlmToolsCliCompletionRequestHistoryItem[];
+  matchedHistory: ILlmToolsCliCompletionRequestHistoryItem[];
   project: {
     path: string;
     files: string[];
