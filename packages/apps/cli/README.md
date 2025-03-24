@@ -17,7 +17,7 @@ llama-server --fim-qwen-3b-default
 Create and bind the ZLE widget for zsh completions:
 
 ```bash
-source ./completion.zsh
+source ./examples/zsh/completion.zsh
 ```
 
 Try it out:

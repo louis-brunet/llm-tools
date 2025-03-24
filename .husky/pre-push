@@ -1,0 +1,6 @@
+yarn run test
+
+echo "TODO: remove exit 1 from pre-push"
+exit 1
+
+# vim:ft=sh

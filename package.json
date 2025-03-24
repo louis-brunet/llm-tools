@@ -1,6 +1,7 @@
 {
   "name": "llm-tools",
   "packageManager": "yarn@4.7.0",
+  "private": true,
   "workspaces": [
     "packages/apps/*",
     "packages/libs/*"
@@ -9,12 +10,15 @@
     "lint": "yarn workspaces foreach --recursive --topological-dev --from='packages/apps/*' run lint",
     "build:server": "yarn workspaces foreach --recursive --topological-dev --from=@llm-tools/server run build",
     "build:cli": "yarn workspaces foreach --recursive --topological-dev --from=@llm-tools/cli run build",
-    "test": "yarn workspaces foreach --recursive --topological-dev --from='packages/apps/*' run test"
+    "test": "yarn workspaces foreach --recursive --topological-dev --from='packages/apps/*' run test",
+    "postinstall": "yarn husky"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.5",
     "@nestjs/schematics": "^11.0.2",
     "@types/node": "^22.13.10",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.0",
     "typescript": "^5.8.2"
   },
   "$schema": "https://json.schemastore.org/package.json"

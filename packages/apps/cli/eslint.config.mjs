@@ -1,5 +1,5 @@
 import globals from 'globals';
-import pluginJs from '@eslint/js';
+import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
@@ -10,7 +10,7 @@ export default [
     files: ['{.,src/**}/*.{js,mjs,cjs,ts,mts}'],
   },
   { languageOptions: { globals: globals.browser } },
-  pluginJs.configs.recommended,
+  eslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   {
     languageOptions: {
@@ -26,7 +26,8 @@ export default [
   eslintPluginPrettierRecommended,
   {
     rules: {
-      // '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-unused-vars': 'off',
     },
   },

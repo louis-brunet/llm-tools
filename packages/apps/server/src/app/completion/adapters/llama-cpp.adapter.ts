@@ -2,20 +2,15 @@ import {
   LlamaCppConfig,
   LlamaCppConfigService,
 } from '#config/configurations/llama-cpp-config.service';
-import { ValidationService } from '#helpers/services';
-import { HttpService } from '@nestjs/axios';
+import { LlamaCppClient, LlamaCppInfillResponse } from '@llm-tools/clients';
 import { Injectable, Logger } from '@nestjs/common';
-import { AxiosError } from 'axios';
-import { catchError, firstValueFrom, tap } from 'rxjs';
-import { InferType, number, object, string } from 'yup';
 import { InfillRequest } from '../interfaces';
-import { LlamaCppClient } from 'llm-tools-clients';
 
-const infillResponseSchema = object({
-  content: string().required(),
-  tokens_predicted: number().integer().required(),
-});
-export type LlamaCppInfillResponse = InferType<typeof infillResponseSchema>;
+// const infillResponseSchema = object({
+//   content: string().required(),
+//   tokens_predicted: number().integer().required(),
+// });
+// export type LlamaCppInfillResponse = InferType<typeof infillResponseSchema>;
 
 @Injectable()
 export class LlamaCppAdapter {
@@ -23,11 +18,7 @@ export class LlamaCppAdapter {
   private readonly logger: Logger = new Logger(LlamaCppAdapter.name);
   private readonly llamaCppClient: LlamaCppClient;
 
-  constructor(
-    private readonly httpService: HttpService,
-    private readonly validationService: ValidationService,
-    configService: LlamaCppConfigService,
-  ) {
+  constructor(configService: LlamaCppConfigService) {
     this.config = configService.getConfig();
     this.llamaCppClient = new LlamaCppClient({
       serverOrigin: this.config.serverOrigin,

@@ -18,6 +18,9 @@ async function bootstrap() {
   });
   console.log(response);
 }
+
 bootstrap()
   .then()
-  .catch((err) => console.error(err));
+  .catch((err: unknown) => {
+    console.error(err);
+  });

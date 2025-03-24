@@ -20,17 +20,17 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "#app/*": [
-        "./src/app/*",
+        "src/app/*"
       ],
       "#helpers/*": [
-        "./src/helpers/*",
+        "src/helpers/*"
       ],
       "#infra/*": [
-        "./src/infra/*",
+        "src/infra/*"
       ],
       "#config/*": [
-        "./src/config/*",
-      ],
+        "src/config/*"
+      ]
     }
   }
 }
