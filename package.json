@@ -10,6 +10,7 @@
     "lint": "yarn workspaces foreach --recursive --topological-dev --from='packages/apps/*' run lint",
     "build:server": "yarn workspaces foreach --recursive --topological-dev --from=@llm-tools/server run build",
     "build:cli": "yarn workspaces foreach --recursive --topological-dev --from=@llm-tools/cli run build",
+    "build:watch": "yarn workspaces foreach --recursive --parallel --interlaced --from=@llm-tools/cli run build:watch",
     "test": "yarn workspaces foreach --recursive --topological-dev --from='packages/apps/*' run test",
     "postinstall": "yarn husky"
   },

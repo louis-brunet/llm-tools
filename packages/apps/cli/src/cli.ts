@@ -21,8 +21,8 @@ const program = new Command()
 
 export type ProgramOptions = ReturnType<typeof program.opts>;
 
-export function runCli() {
-  const parsed = program.parse();
+export async function runCli() {
+  const parsed = await program.parseAsync();
   const globalOptions = parsed.opts();
   if (globalOptions.debug) {
     console.log('Options:', globalOptions);

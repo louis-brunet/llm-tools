@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { beforeEach, describe, it, mock, TestContext } from 'node:test';
 import { HttpClient } from './http-client';
 import { notImplemented } from '../../../test/utils/not-implemented';
 import { HttpError } from './error';
 
-void describe('HttpClient', async () => {
+describe('HttpClient', () => {
   let client: HttpClient;
   const fetchMock = mock.method(global, 'fetch');
   fetchMock.mock.mockImplementation(notImplemented);
@@ -12,12 +13,12 @@ void describe('HttpClient', async () => {
     client = new HttpClient();
   });
 
-  await it('is defined', (t: TestContext) => {
+  it('is defined', (t: TestContext) => {
     t.assert.ok(client);
   });
 
-  await describe('post', async () => {
-    await it('fetches json data', async (t: TestContext) => {
+  describe('post', () => {
+    it('fetches json data', async (t: TestContext) => {
       const mockJsonData = {
         foo: 'foo',
         bar: 42,
@@ -46,7 +47,7 @@ void describe('HttpClient', async () => {
       t.assert.strictEqual(fetchMock.mock.calls[0].arguments[1].method, 'POST');
     });
 
-    await it('throws error if response if not OK', async (t: TestContext) => {
+    it('throws error if response if not OK', async (t: TestContext) => {
       const fetchMock = t.mock.method(global, 'fetch');
       fetchMock.mock.mockImplementation(() => {
         return Promise.resolve({
@@ -71,10 +72,50 @@ void describe('HttpClient', async () => {
       );
       t.assert.strictEqual(fetchMock.mock.calls[0].arguments[1].method, 'POST');
     });
+
+    it('sends given headers', async (t: TestContext) => {
+      const mockJsonData = {};
+      const fetchMock = t.mock.method(global, 'fetch');
+      fetchMock.mock.mockImplementation(() => {
+        return Promise.resolve({
+          ok: true,
+          json: async () => Promise.resolve(mockJsonData),
+        } as Response);
+      });
+
+      const headers = { 'x-some-header': 'header-value' };
+      const _result = await client.post('https://example.com', {}, { headers });
+
+      t.assert.strictEqual(fetchMock.mock.callCount(), 1);
+      t.assert.deepStrictEqual(
+        fetchMock.mock.calls[0].arguments[1]?.headers,
+        headers,
+      );
+    });
+
+    it('handles undefined headers', async (t: TestContext) => {
+      const mockJsonData = {};
+      const fetchMock = t.mock.method(global, 'fetch');
+      fetchMock.mock.mockImplementation(() => {
+        return Promise.resolve({
+          ok: true,
+          json: async () => Promise.resolve(mockJsonData),
+        } as Response);
+      });
+
+      const headers = undefined;
+      const _result = await client.post('https://example.com', {}, { headers });
+
+      t.assert.strictEqual(fetchMock.mock.callCount(), 1);
+      t.assert.deepStrictEqual(
+        fetchMock.mock.calls[0].arguments[1]?.headers,
+        headers,
+      );
+    });
   });
 
-  await describe('postStream', async () => {
-    await it('fetches stream data', async (t: TestContext) => {
+  describe('postStream', () => {
+    it('fetches stream data', async (t: TestContext) => {
       const fetchMock = t.mock.method(global, 'fetch');
       fetchMock.mock.mockImplementation(() => {
         return Promise.resolve({
@@ -108,7 +149,7 @@ void describe('HttpClient', async () => {
       t.assert.strictEqual(fetchMock.mock.calls[0].arguments[1].method, 'POST');
     });
 
-    await it('yields nothing when there is no body', async (t: TestContext) => {
+    it('yields nothing when there is no body', async (t: TestContext) => {
       const fetchMock = t.mock.method(global, 'fetch');
       fetchMock.mock.mockImplementation(() => {
         return Promise.resolve({
@@ -124,8 +165,8 @@ void describe('HttpClient', async () => {
     });
   });
 
-  await describe('get', async () => {
-    await it('fetches json data', async (t: TestContext) => {
+  describe('get', () => {
+    it('fetches json data', async (t: TestContext) => {
       const mockJsonData = {
         foo: 'foo',
         bar: 42,

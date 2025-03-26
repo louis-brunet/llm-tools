@@ -4,9 +4,11 @@
   "bin": "./build/main.js",
   "scripts": {
     "lint": "yarn eslint \"{src,tests?}/**/*.ts\" --fix",
-    "build": "yarn tsc --project tsconfig.build.json && chmod u+x build/main.js",
+    "build": "yarn run build:_base && chmod u+x build/main.js",
+    "build:watch": "yarn run build:_base --watch",
+    "build:_base": "yarn tsc --project tsconfig.build.json",
     "start:cli": "./build/main.js",
-    "test": "yarn run test:_base '{src,tests?}/**/*.test.{js,ts}'",
+    "test": "yarn run test:_base '{src,test{,s}}/**/*.test.{js,ts}'",
     "test:debug": "yarn run test:_base --inspect '{src,tests?}/**/*.test.{js,ts}'",
     "test:_base": "TS_NODE_PROJECT=tsconfig.test.json node --experimental-test-coverage --test-coverage-include='src/**/*' --test-coverage-exclude='**/*.test.{js,ts}' --test-coverage-branches=80 --test-coverage-lines=60 --enable-source-maps --require ts-node/register --test"
   },

@@ -1,3 +1,4 @@
 export * from './llama-cpp';
-export * from './llm-tools-client';
+export * from './llm-tools-service';
+export * from './ollama';
 export * from './types';

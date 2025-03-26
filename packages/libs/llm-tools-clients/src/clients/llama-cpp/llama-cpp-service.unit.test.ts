@@ -4,6 +4,7 @@ import {
   ILlmToolsCliCompletionRequest,
   ILlmToolsInfillRequest,
   ILlmToolsInfillResponse,
+  LlmToolsBackendEnum,
 } from '../types';
 import { LlamaCppClient } from './llama-cpp-client';
 import { LlamaCppCompletionResponse, LlamaCppInfillResponse } from './types';
@@ -12,7 +13,7 @@ void describe('LlamaCppService', async () => {
   let service: LlamaCppService;
   beforeEach(() => {
     service = new LlamaCppService({
-      backend: 'llama-cpp',
+      backend: LlmToolsBackendEnum.LLAMA_CPP,
       serverOrigin: 'some-server-origin',
     });
   });

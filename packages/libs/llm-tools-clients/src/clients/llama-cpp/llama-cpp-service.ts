@@ -1,3 +1,5 @@
+import { LlamaCppClient } from './llama-cpp-client';
+
 import type {
   ILlmToolsCliCompletionRequest,
   ILlmToolsInfillRequest,
@@ -5,7 +7,6 @@ import type {
   ILlmToolsService,
   LlmToolsClientConfigLlamaCpp,
 } from '../types';
-import { LlamaCppClient } from './llama-cpp-client';
 import type {
   ILlamaCppInfillRequest,
   LlamaCppCompletionResponse,

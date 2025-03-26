@@ -1,22 +1,25 @@
 import { LlamaCppService } from './llama-cpp';
+import { OllamaService } from './ollama';
 import {
   ILlmToolsCliCompletionRequest,
   ILlmToolsService,
   ILlmToolsInfillRequest,
   ILlmToolsInfillResponse,
-  LlmToolsClientConfig,
+  LlmToolsServiceConfig,
+  LlmToolsBackendEnum,
 } from './types';
 
 export class LlmToolsService implements ILlmToolsService {
   private readonly client: ILlmToolsService;
 
-  constructor(clientConfig: LlmToolsClientConfig) {
-    switch (clientConfig.backend) {
-      case 'llama-cpp':
-        this.client = new LlamaCppService(clientConfig);
+  constructor(backendConfig: LlmToolsServiceConfig) {
+    switch (backendConfig.backend) {
+      case LlmToolsBackendEnum.LLAMA_CPP:
+        this.client = new LlamaCppService(backendConfig);
         break;
-      default:
-        throw new Error(`Backend not implemented: ${clientConfig.backend}`);
+      case LlmToolsBackendEnum.OLLAMA:
+        this.client = new OllamaService(backendConfig);
+        break;
     }
   }
 

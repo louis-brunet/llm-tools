@@ -1,8 +1,8 @@
 import { Command, Option } from '@commander-js/extra-typings';
 import {
-  LlmToolsBackendType,
-  LlmToolsClientConfig,
+  LlmToolsBackendEnum,
   LlmToolsService,
+  LlmToolsServiceConfig,
 } from '@llm-tools/clients';
 import { ProgramOptions } from '../cli';
 import { ENVIRONMENT_CONFIG } from '../config';
@@ -31,8 +31,8 @@ export const cliCompletionCommand = new Command()
   )
   .addOption(
     new Option('-b, --backend <text>', 'LLM backend type')
-      .choices(['llama-cpp', 'ollama'] satisfies LlmToolsBackendType[])
-      .default('llama-cpp')
+      .choices(Object.values(LlmToolsBackendEnum))
+      .default(LlmToolsBackendEnum.LLAMA_CPP)
       .env(`${ENV_PREFIX}_BACKEND`),
   )
   .addOption(
@@ -65,16 +65,18 @@ export async function cliCompletion(
     console.log('Completion options: ', completionOptions);
   }
   try {
-    let backendConfig: LlmToolsClientConfig;
+    let backendConfig: LlmToolsServiceConfig;
     switch (completionOptions.backend) {
-      case 'llama-cpp':
+      case LlmToolsBackendEnum.LLAMA_CPP:
         backendConfig = {
           backend: completionOptions.backend,
           serverOrigin: completionOptions.server,
         };
         break;
-      case 'ollama':
-        throw new Error('Ollama backend not implemented yet');
+      case LlmToolsBackendEnum.OLLAMA:
+        backendConfig = {
+          backend: completionOptions.backend,
+        };
     }
     const client = new LlmToolsService(backendConfig);
     const history = completionOptions.recentHistory.map((command) => ({

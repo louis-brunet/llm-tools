@@ -1,17 +1,22 @@
+export enum LlmToolsBackendEnum {
+  LLAMA_CPP = 'llama-cpp',
+  OLLAMA = 'ollama',
+}
+
 export type LlmToolsClientConfigLlamaCpp = {
-  backend: 'llama-cpp';
+  backend: LlmToolsBackendEnum.LLAMA_CPP;
   serverOrigin: string;
 };
 
 export type LlmToolsClientConfigOllama = {
-  backend: 'ollama';
+  backend: LlmToolsBackendEnum.OLLAMA;
 };
 
-export type LlmToolsClientConfig =
+export type LlmToolsServiceConfig =
   | LlmToolsClientConfigLlamaCpp
   | LlmToolsClientConfigOllama;
 
-export type LlmToolsBackendType = LlmToolsClientConfig['backend'];
+// export type LlmToolsBackendType = LlmToolsClientConfig['backend'];
 
 export interface ILlmToolsInfillRequestExtraContext {
   fileName: string;
