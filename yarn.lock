@@ -1215,9 +1215,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@llm-tools/clients@workspace:*, @llm-tools/clients@workspace:packages/libs/llm-tools-clients":
+"@llm-tools/clients@workspace:*, @llm-tools/clients@workspace:packages/libs/clients":
   version: 0.0.0-use.local
-  resolution: "@llm-tools/clients@workspace:packages/libs/llm-tools-clients"
+  resolution: "@llm-tools/clients@workspace:packages/libs/clients"
   dependencies:
     "@eslint/js": "npm:^9.22.0"
     "@types/node": "npm:^22.13.10"
