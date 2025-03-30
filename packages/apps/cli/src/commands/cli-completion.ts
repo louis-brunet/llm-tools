@@ -8,6 +8,7 @@ import { ProgramOptions } from '../cli';
 import { ENVIRONMENT_CONFIG } from '../config';
 
 const ENV_PREFIX = ENVIRONMENT_CONFIG.prefix.cliCompletion;
+
 export const cliCompletionCommand = new Command()
   .name('cli-completion')
   .requiredOption('-d, --working-directory <text>', 'Current working directory')
@@ -30,7 +31,7 @@ export const cliCompletionCommand = new Command()
       .env(`${ENV_PREFIX}_SERVER`),
   )
   .addOption(
-    new Option('-b, --backend <text>', 'LLM backend type')
+    new Option('--backend <text>', 'LLM backend type')
       .choices(Object.values(LlmToolsBackendEnum))
       .default(LlmToolsBackendEnum.LLAMA_CPP)
       .env(`${ENV_PREFIX}_BACKEND`),

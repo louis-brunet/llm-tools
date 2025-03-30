@@ -8,12 +8,13 @@
     "build:watch": "yarn run build --watch",
     "test": "yarn run test:_base '{src,test{,s}}/**/*.test.ts'",
     "test:debug": "yarn run test:_base --inspect '{src,test{,s}}/**/*.test.ts'",
-    "test:_base": "node --experimental-test-coverage --test-coverage-include='src/**/*' --test-coverage-exclude='**/{*.test,types}.ts' --test-coverage-branches=80 --test-coverage-lines=80 --enable-source-maps --require ts-node/register --test"
+    "test:_base": "node --experimental-test-module-mocks --experimental-test-coverage --test-coverage-include='src/**/*' --test-coverage-exclude='**/{*.test,types}.ts' --test-coverage-branches=80 --test-coverage-lines=80 --enable-source-maps --require ts-node/register --test"
   },
   "author": "Louis Brunet",
   "license": "MIT",
   "description": "",
   "dependencies": {
+    "ollama": "^0.5.14",
     "yup": "^1.6.1"
   },
   "devDependencies": {

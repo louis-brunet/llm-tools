@@ -1,28 +1,40 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import { beforeEach, describe, it, TestContext } from 'node:test';
+import { GenerateRequest, GenerateResponse } from 'ollama';
 import {
   ILlmToolsCliCompletionRequest,
   ILlmToolsInfillRequest,
   ILlmToolsInfillResponse,
-  LlmToolsBackendEnum,
 } from '../types';
-import { LlamaCppClient } from './llama-cpp-client';
-import { LlamaCppService } from './llama-cpp-service';
-import {
-  LlamaCppCompletionResponse,
-  LlamaCppInfillResponse,
-  LlamaCppModelEnum,
-} from './types';
+import { OllamaService } from './ollama-service';
+import { OllamaClient } from './ollama-client';
 
-const modelsToTest = Object.values(LlamaCppModelEnum);
+const modelsToTest = [
+  'qwen2.5-coder',
+  // 'some-model',
+];
 
-describe('LlamaCppService (unit)', () => {
+describe('OllamaService (unit)', () => {
   for (const model of modelsToTest) {
     describe(`with model '${model}'`, () => {
-      let service: LlamaCppService;
+      let service: OllamaService;
+      const mockGenerateResponse: GenerateResponse = {
+        context: [],
+        created_at: new Date(),
+        done: true,
+        done_reason: '',
+        eval_count: 1,
+        eval_duration: 1,
+        load_duration: 1,
+        model,
+        prompt_eval_count: 1,
+        prompt_eval_duration: 1,
+        response: 'some-response',
+        total_duration: 1,
+      } as const;
+
       beforeEach(() => {
-        service = new LlamaCppService({
-          backend: LlmToolsBackendEnum.LLAMA_CPP,
+        service = new OllamaService({
           serverOrigin: 'some-server-origin',
           model,
         });
@@ -43,22 +55,21 @@ describe('LlamaCppService (unit)', () => {
               { fileName: 'file2', text: 'text2' },
             ],
           };
-          const infillResponse: LlamaCppInfillResponse = {
-            content: 'content',
-            tokens_predicted: 42,
-          };
+          const infillResponse: GenerateResponse = mockGenerateResponse;
           const mappedInfillResponse: ILlmToolsInfillResponse = {
-            content: 'content',
+            content: infillResponse.response,
           };
-          const infillSpy = t.mock.method(
-            LlamaCppClient.prototype,
-            'infill',
-            (): Promise<LlamaCppInfillResponse> =>
+          const generateMock = t.mock.method(
+            OllamaClient.prototype,
+            'generate',
+            (_request: GenerateRequest): Promise<GenerateResponse> =>
               Promise.resolve(infillResponse),
           );
+
           const result = await service.infill(infillRequest);
+
           t.assert.deepStrictEqual(result, mappedInfillResponse);
-          t.assert.strictEqual(infillSpy.mock.callCount(), 1);
+          t.assert.strictEqual(generateMock.mock.callCount(), 1);
         });
       });
 
@@ -81,42 +92,53 @@ describe('LlamaCppService (unit)', () => {
               files: ['some-file.ts'],
             },
           };
-          const clientCompletionResponse: LlamaCppCompletionResponse = {
-            content: 'cliCompletionResponse',
-          } as LlamaCppCompletionResponse;
+          const clientCompletionResponse: GenerateResponse =
+            mockGenerateResponse;
           const cliCompletionResponse: string = 'cliCompletionResponse';
-          const cliCompletionSpy = t.mock.method(
-            LlamaCppClient.prototype,
-            'completion',
-            (): Promise<LlamaCppCompletionResponse> =>
+
+          const generateMock = t.mock.method(
+            OllamaClient.prototype,
+            'generate',
+            (_request: GenerateRequest): Promise<GenerateResponse> =>
               Promise.resolve(clientCompletionResponse),
           );
 
           const result = await service.cliCompletion(cliCompletionRequest);
 
           t.assert.deepStrictEqual(result, cliCompletionResponse);
-          t.assert.strictEqual(cliCompletionSpy.mock.callCount(), 1);
-          const completionArguments =
-            cliCompletionSpy.mock.calls[0].arguments[0];
+          t.assert.strictEqual(generateMock.mock.callCount(), 1);
+
+          // const cliCompletionSpy = t.mock.method(
+          //   OllamaClient.prototype,
+          //   'generate',
+          //   (): Promise<LlamaCppCompletionResponse> =>
+          //     Promise.resolve(clientCompletionResponse),
+          // );
+          //
+          // const result = await service.cliCompletion(cliCompletionRequest);
+          //
+          // t.assert.deepStrictEqual(result, cliCompletionResponse);
+          // t.assert.strictEqual(cliCompletionSpy.mock.callCount(), 1);
+
+          const completionArguments = generateMock.mock.calls[0].arguments[0];
           t.assert.ok(completionArguments);
           const completionPrompt = completionArguments.prompt;
           t.assert.ok(typeof completionPrompt === 'string');
           t.assert.ok(
-            cliCompletionSpy.mock.calls[0].arguments[0]?.stop?.includes('\n'),
-          );
-          t.assert.ok(
-            cliCompletionSpy.mock.calls[0].arguments[0]?.stop?.includes(
-              cliCompletionRequest.promptSuffix,
+            generateMock.mock.calls[0].arguments[0].options?.stop?.includes(
+              '\n',
             ),
           );
-          t.assert.match(
-            completionPrompt,
-            new RegExp(cliCompletionRequest.shell),
+          t.assert.ok(
+            generateMock.mock.calls[0].arguments[0].options?.stop?.includes(
+              cliCompletionRequest.promptSuffix,
+            ),
           );
           for (const matchingString of [
             ...cliCompletionRequest.history.map((h) => h.command),
             ...cliCompletionRequest.matchedHistory.map((h) => h.command),
             ...cliCompletionRequest.project.files,
+            cliCompletionRequest.shell,
           ]) {
             t.assert.match(completionPrompt, new RegExp(matchingString));
           }

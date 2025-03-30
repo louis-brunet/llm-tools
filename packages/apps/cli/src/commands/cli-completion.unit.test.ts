@@ -22,20 +22,20 @@ const baseOptions = {
   shell: 'zsh',
 } satisfies Partial<CliCompletionCommandOptions>;
 
-const backendsToTest = Object.values(LlmToolsBackendEnum).map((backend) => {
-  return {
-    backend,
-  };
-});
+const backendsToTest = Object.values(LlmToolsBackendEnum).map(
+  (backend) =>
+    ({
+      backend,
+    }) as const,
+);
 
-describe('cliCompletion', () => {
+describe('cliCompletion (unit)', () => {
   it('is defined', (t: TestContext) => {
     t.assert.ok(cliCompletionCommand);
     t.assert.ok(cliCompletion);
   });
 
-  for (const backendToTest of backendsToTest) {
-    const { backend } = backendToTest;
+  for (const { backend } of backendsToTest) {
     describe(`with backend ${backend}`, () => {
       it('calls library with expected inputs', async (t: TestContext) => {
         const request = { ...baseOptions, backend };

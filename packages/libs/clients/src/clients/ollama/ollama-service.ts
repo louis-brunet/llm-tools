@@ -1,24 +1,52 @@
+import { IModelAdapter, Qwen25CoderAdapter } from '../../models';
+import { NotImplementedError } from '../../utils';
 import type {
   ILlmToolsCliCompletionRequest,
   ILlmToolsInfillRequest,
   ILlmToolsInfillResponse,
   ILlmToolsService,
-  LlmToolsClientConfigOllama,
 } from '../types';
+import { OllamaClient } from './ollama-client';
+import { ILlmToolsOllamaConfig } from './types';
 
 export class OllamaService implements ILlmToolsService {
-  // eslint-disable-next-line @typescript-eslint/no-useless-constructor
-  constructor(_config: LlmToolsClientConfigOllama) {}
+  private readonly client: OllamaClient;
 
-  infill(_request: ILlmToolsInfillRequest): Promise<ILlmToolsInfillResponse> {
-    // return Promise.resolve({
-    //   content: '',
-    //   tokensPredicted: 0,
-    // });
-    throw new Error('infill not implemented');
+  private _modelAdapter?: IModelAdapter;
+  private get modelAdapter(): IModelAdapter {
+    return (this._modelAdapter ??= this.createModelAdapter(this.config.model));
+  }
+
+  constructor(private readonly config: ILlmToolsOllamaConfig) {
+    this.client = new OllamaClient(config);
+  }
+
+  async infill(
+    request: ILlmToolsInfillRequest,
+  ): Promise<ILlmToolsInfillResponse> {
+    const prompt = this.modelAdapter.createInfillPrompt({
+      ...request,
+      repoName: 'current-project',
+      currentFileName: 'current-file',
+    });
+    const result = await this.client.generate({
+      model: this.config.model,
+      prompt,
+      raw: true,
+      suffix: request.inputSuffix,
+    });
+    return { content: result.response };
   }
 
   cliCompletion(_request: ILlmToolsCliCompletionRequest): Promise<string> {
-    throw new Error('cliCompletion not implemented');
+    throw new NotImplementedError(this.cliCompletion.name);
+  }
+
+  private createModelAdapter(model: string): IModelAdapter {
+    if (model.includes('qwen2.5-coder')) {
+      return new Qwen25CoderAdapter();
+    } else {
+      throw new NotImplementedError(`no model adapter for ${model}`);
+    }
   }
 }

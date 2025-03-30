@@ -1,7 +1,7 @@
 # llm-tools
 
 ```bash
-yarn workspaces foreach --recursive --topological-dev --from='@llm-tools/cli' run build
+yarn run build:cli
 yarn run start:cli --help
 ```
 

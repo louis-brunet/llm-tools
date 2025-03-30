@@ -1,19 +1,28 @@
-import { Command } from '@commander-js/extra-typings';
+import { Command, Option } from '@commander-js/extra-typings';
 import {
   ILlmToolsInfillRequestExtraContext,
   LlmToolsBackendEnum,
   LlmToolsService,
 } from '@llm-tools/clients';
 import { ProgramOptions } from '../cli';
+import { ENVIRONMENT_CONFIG } from '../config';
+
+const ENV_PREFIX = ENVIRONMENT_CONFIG.prefix.infill;
 
 export const infillCommand = new Command()
   .name('infill')
-  .option('-s, --server <url>', 'Server URL', 'http://localhost:8012')
-  .option('-p, --prefix <text>', 'Input prefix text', '')
-  .option('-x, --suffix <text>', 'Input suffix text', '')
-  .option('-t, --prompt <text>', 'Prompt text', '')
-  .option('-e, --extra <filename:content...>', 'Extra context', [] as string[])
+  .option('--server <url>', 'Server URL', 'http://localhost:8012')
+  .option('--prefix <text>', 'Input prefix text', '')
+  .option('--suffix <text>', 'Input suffix text', '')
+  .option('--prompt <text>', 'Prompt text', '')
+  .option('--extra <filename:content...>', 'Extra context', [] as string[])
   .option('--multi-line', 'Enable returning multiple lines', false)
+  .addOption(
+    new Option('--backend <text>', 'LLM backend type')
+      .choices(Object.values(LlmToolsBackendEnum))
+      .default(LlmToolsBackendEnum.LLAMA_CPP)
+      .env(`${ENV_PREFIX}_BACKEND`),
+  )
   .action(infillCommandAction);
 
 export type InfillCommandOptions = ReturnType<typeof infillCommand.opts>;
@@ -39,7 +48,7 @@ export async function infill(
   // try {
   // Initialize client
   const client = new LlmToolsService({
-    backend: LlmToolsBackendEnum.LLAMA_CPP,
+    backend: infillOptions.backend,
     serverOrigin: infillOptions.server,
   });
 
@@ -81,9 +90,4 @@ export async function infill(
     }
   }
   return result;
-  // process.stdout.write(result);
-  // } catch (error) {
-  //   console.error('Error:', (error as { message?: unknown }).message || error);
-  //   process.exit(1);
-  // }
 }

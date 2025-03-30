@@ -23,5 +23,6 @@ export const ENVIRONMENT_CONFIG = {
   prefix: {
     global: ENV_VAR_PREFIX,
     cliCompletion: `${ENV_VAR_PREFIX}_CLI_COMPLETION` as const,
+    infill: `${ENV_VAR_PREFIX}_INFILL` as const,
   },
 } as const;

@@ -9,6 +9,8 @@
     "build:_base": "yarn tsc --project tsconfig.build.json",
     "start:cli": "./build/main.js",
     "test": "yarn run test:_base '{src,test{,s}}/**/*.test.{js,ts}'",
+    "test:e2e": "yarn run test:_base '{src,test{,s}}/**/*.e2e.test.{js,ts}'",
+    "test:unit": "yarn run test:_base '{src,test{,s}}/**/*.unit.test.{js,ts}'",
     "test:debug": "yarn run test:_base --inspect '{src,tests?}/**/*.test.{js,ts}'",
     "test:_base": "TS_NODE_PROJECT=tsconfig.test.json node --experimental-test-coverage --test-coverage-include='src/**/*' --test-coverage-exclude='**/*.test.{js,ts}' --test-coverage-branches=80 --test-coverage-lines=60 --enable-source-maps --require ts-node/register --test"
   },

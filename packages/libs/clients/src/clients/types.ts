@@ -1,20 +1,34 @@
+import { ILlamaCppClientConfig } from './llama-cpp';
+
 export enum LlmToolsBackendEnum {
   LLAMA_CPP = 'llama-cpp',
   OLLAMA = 'ollama',
 }
 
-export type LlmToolsClientConfigLlamaCpp = {
-  backend: LlmToolsBackendEnum.LLAMA_CPP;
-  serverOrigin: string;
-};
+// export type LlmToolsClientConfigLlamaCpp = {
+//   backend: LlmToolsBackendEnum.LLAMA_CPP;
+//   serverOrigin: string;
+// };
 
-export type LlmToolsClientConfigOllama = {
+export interface ILlmToolsClientConfigLlamaCpp extends ILlamaCppClientConfig {
+  backend: LlmToolsBackendEnum.LLAMA_CPP;
+}
+
+// export type LlmToolsClientConfigOllama = {
+//   backend: LlmToolsBackendEnum.OLLAMA;
+//   serverOrigin: string;
+//   model: string;
+// };
+
+export interface ILlmToolsClientConfigOllama {
   backend: LlmToolsBackendEnum.OLLAMA;
-};
+  serverOrigin: string;
+  model: string;
+}
 
 export type LlmToolsServiceConfig =
-  | LlmToolsClientConfigLlamaCpp
-  | LlmToolsClientConfigOllama;
+  | ILlmToolsClientConfigLlamaCpp
+  | ILlmToolsClientConfigOllama;
 
 // export type LlmToolsBackendType = LlmToolsClientConfig['backend'];
 
@@ -34,7 +48,6 @@ export interface ILlmToolsInfillRequest {
 
 export interface ILlmToolsInfillResponse {
   content: string;
-  tokensPredicted: number;
 }
 
 export interface ILlmToolsCliCompletionRequestHistoryItem {

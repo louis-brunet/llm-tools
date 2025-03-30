@@ -6,8 +6,13 @@ import {
   infillResponseSchema,
 } from './schemas';
 
+export enum LlamaCppModelEnum {
+  QWEN_2_5_CODER = 'qwen2.5-coder',
+}
+
 export interface ILlamaCppClientConfig {
   serverOrigin: string;
+  model: LlamaCppModelEnum;
 }
 
 export interface ILlamaCppInfillRequestExtraContext {

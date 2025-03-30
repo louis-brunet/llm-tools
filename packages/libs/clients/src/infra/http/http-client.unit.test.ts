@@ -4,7 +4,7 @@ import { HttpClient } from './http-client';
 import { notImplemented } from '../../../test/utils/not-implemented';
 import { HttpError } from './error';
 
-describe('HttpClient', () => {
+describe('HttpClient (unit)', () => {
   let client: HttpClient;
   const fetchMock = mock.method(global, 'fetch');
   fetchMock.mock.mockImplementation(notImplemented);

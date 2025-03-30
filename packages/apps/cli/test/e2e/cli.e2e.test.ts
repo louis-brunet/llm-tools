@@ -47,14 +47,26 @@ function createArgv(
   ];
 }
 
-const backendsToTest = Object.values(LlmToolsBackendEnum).map((backend) => {
-  return {
-    backend,
-  };
-});
+const backendToTest = {
+  [LlmToolsBackendEnum.LLAMA_CPP]: {
+    endpoints: {
+      infill: '/infill',
+      cliCompletion: '/completion',
+    },
+  },
+  [LlmToolsBackendEnum.OLLAMA]: {
+    endpoints: {
+      infill: '/infill',
+      cliCompletion: '/completion',
+    },
+  },
+} as const satisfies Record<
+  LlmToolsBackendEnum,
+  { endpoints: { infill: string; cliCompletion: string } }
+>;
 
 describe('cli (e2e)', () => {
-  for (const { backend } of backendsToTest) {
+  for (const [backend, { endpoints }] of Object.entries(backendToTest)) {
     describe(`with backend ${backend}`, () => {
       describe(`command infill`, () => {
         it('prints result to stdout with all optional aguments', async (t: TestContext) => {
@@ -74,7 +86,7 @@ describe('cli (e2e)', () => {
             prefix: 'some-prefix',
             suffix: 'some-suffix',
             prompt: 'some-prompt',
-            // TODO: add backend options for infill command
+            backend,
           };
           const infillArrayOptions = {
             extra: ['file1:content1', 'file2:content2'],
@@ -91,7 +103,7 @@ describe('cli (e2e)', () => {
           t.assert.strictEqual(fetchMock.mock.callCount(), 1);
           t.assert.strictEqual(
             fetchMock.mock.calls[0].arguments[0],
-            `${infillOptions.server}/infill`,
+            `${infillOptions.server}${endpoints.infill}`,
           );
 
           t.assert.strictEqual(stdoutWriteMock.mock.callCount(), 1);
@@ -146,7 +158,7 @@ describe('cli (e2e)', () => {
           t.assert.strictEqual(fetchMock.mock.callCount(), 1);
           t.assert.strictEqual(
             fetchMock.mock.calls[0].arguments[0],
-            `${options.server}/completion`,
+            `${options.server}${endpoints.cliCompletion}`,
           );
 
           t.assert.strictEqual(stdoutWriteMock.mock.callCount(), 1);
