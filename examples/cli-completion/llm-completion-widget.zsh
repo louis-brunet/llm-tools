@@ -44,7 +44,7 @@ function llm-completion-widget() {
       --suffix "$suffix" \
       --working-directory "$(pwd)" \
       --files "${files_args[@]}" \
-      --history "${history_args[@]}" \
+      --recent-history "${history_args[@]}" \
       --matched-history "${matching_commands[@]}"
   )
 
