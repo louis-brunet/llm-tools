@@ -5,7 +5,11 @@ yarn run build:cli
 yarn run start:cli --help
 ```
 
-## Example usage
+## Examples
+
+See [./examples](./examples).
+
+### zsh completion widget
 
 Launch llama.cpp's llama-server on port 8012:
 
@@ -13,7 +17,7 @@ Launch llama.cpp's llama-server on port 8012:
 llama-server --fim-qwen-3b-default
 ```
 
-Create and bind the ZLE widget for zsh completions:
+Create and bind the [ZLE widget](./examples/cli-completion/llm-completion-widget.zsh) for zsh completions:
 
 ```bash
 source ./examples/cli-completion/llm-completion-widget.zsh
