@@ -94,7 +94,7 @@ describe('OllamaService (unit)', () => {
           };
           const clientCompletionResponse: GenerateResponse =
             mockGenerateResponse;
-          const cliCompletionResponse: string = 'cliCompletionResponse';
+          const cliCompletionResponse: string = mockGenerateResponse.response;
 
           const generateMock = t.mock.method(
             OllamaClient.prototype,
@@ -107,30 +107,14 @@ describe('OllamaService (unit)', () => {
 
           t.assert.deepStrictEqual(result, cliCompletionResponse);
           t.assert.strictEqual(generateMock.mock.callCount(), 1);
-
-          // const cliCompletionSpy = t.mock.method(
-          //   OllamaClient.prototype,
-          //   'generate',
-          //   (): Promise<LlamaCppCompletionResponse> =>
-          //     Promise.resolve(clientCompletionResponse),
-          // );
-          //
-          // const result = await service.cliCompletion(cliCompletionRequest);
-          //
-          // t.assert.deepStrictEqual(result, cliCompletionResponse);
-          // t.assert.strictEqual(cliCompletionSpy.mock.callCount(), 1);
-
           const completionArguments = generateMock.mock.calls[0].arguments[0];
           t.assert.ok(completionArguments);
           const completionPrompt = completionArguments.prompt;
           t.assert.ok(typeof completionPrompt === 'string');
+          t.assert.strictEqual(completionArguments.model, model);
+          t.assert.ok(completionArguments.options?.stop?.includes('\n'));
           t.assert.ok(
-            generateMock.mock.calls[0].arguments[0].options?.stop?.includes(
-              '\n',
-            ),
-          );
-          t.assert.ok(
-            generateMock.mock.calls[0].arguments[0].options?.stop?.includes(
+            completionArguments.options?.stop?.includes(
               cliCompletionRequest.promptSuffix,
             ),
           );

@@ -1,3 +1,4 @@
+import { GenerateResponse } from 'ollama';
 import { IModelAdapter, Qwen25CoderAdapter } from '../../models';
 import { NotImplementedError } from '../../utils';
 import type {
@@ -8,6 +9,12 @@ import type {
 } from '../types';
 import { OllamaClient } from './ollama-client';
 import { ILlmToolsOllamaConfig } from './types';
+
+interface IOllamaManualInfillRequest extends ILlmToolsInfillRequest {
+  system?: string | undefined;
+  repoName: string;
+  currentFileName: string;
+}
 
 export class OllamaService implements ILlmToolsService {
   private readonly client: OllamaClient;
@@ -38,8 +45,53 @@ export class OllamaService implements ILlmToolsService {
     return { content: result.response };
   }
 
-  cliCompletion(_request: ILlmToolsCliCompletionRequest): Promise<string> {
-    throw new NotImplementedError(this.cliCompletion.name);
+  async cliCompletion(request: ILlmToolsCliCompletionRequest): Promise<string> {
+    const response = await this.manualInfill({
+      repoName: request.project.path,
+      currentFileName: `command-to-complete.${request.shell}`,
+      inputPrefix: request.promptPrefix,
+      inputSuffix: request.promptSuffix,
+      prompt: '',
+      system: `You must complete the current command line using valid ${request.shell} syntax. The command should be a single line.`,
+      singleLine: true,
+      inputExtra: [
+        ...request.project.files.map((file) => ({ fileName: file, text: '' })),
+        {
+          fileName: '.histfile',
+          text: [...request.matchedHistory, ...request.history].reduce(
+            (previous, historyItem) => `${previous}${historyItem.command}\n`,
+            '',
+          ),
+        },
+      ],
+    });
+    return response.response;
+  }
+
+  private async manualInfill(
+    request: IOllamaManualInfillRequest,
+  ): Promise<GenerateResponse> {
+    const prompt = this.modelAdapter.createInfillPrompt(request);
+
+    const stop: string[] = [];
+    if (request.singleLine) {
+      stop.push('\n');
+    }
+    if (request.inputSuffix.trim()) {
+      stop.push(request.inputSuffix);
+    }
+
+    const response = await this.client.generate({
+      prompt,
+      model: this.config.model,
+      options: {
+        stop,
+        temperature: 0.2,
+        // top_p: 0.6,
+        // top_k: ,
+      },
+    });
+    return response;
   }
 
   private createModelAdapter(model: string): IModelAdapter {
