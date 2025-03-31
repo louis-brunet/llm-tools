@@ -1,8 +1,10 @@
 import { Command, Option } from '@commander-js/extra-typings';
 import {
   ILlmToolsInfillRequestExtraContext,
+  LlamaCppModelEnum,
   LlmToolsBackendEnum,
   LlmToolsService,
+  LlmToolsServiceConfig,
 } from '@llm-tools/clients';
 import { ProgramOptions } from '../cli';
 import { ENVIRONMENT_CONFIG } from '../config';
@@ -45,12 +47,24 @@ export async function infill(
   if (globalOptions?.debug) {
     console.debug('Infill options: ', infillOptions);
   }
-  // try {
   // Initialize client
-  const client = new LlmToolsService({
-    backend: infillOptions.backend,
-    serverOrigin: infillOptions.server,
-  });
+  let backendConfig: LlmToolsServiceConfig;
+  switch (infillOptions.backend) {
+    case LlmToolsBackendEnum.LLAMA_CPP:
+      backendConfig = {
+        backend: infillOptions.backend,
+        serverOrigin: infillOptions.server,
+        model: LlamaCppModelEnum.QWEN_2_5_CODER,
+      };
+      break;
+    case LlmToolsBackendEnum.OLLAMA:
+      backendConfig = {
+        backend: infillOptions.backend,
+        model: 'qwen2.5-coder',
+        serverOrigin: infillOptions.server,
+      };
+  }
+  const client = new LlmToolsService(backendConfig);
 
   let extraContext: ILlmToolsInfillRequestExtraContext[] | undefined =
     undefined;

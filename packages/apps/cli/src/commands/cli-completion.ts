@@ -1,5 +1,8 @@
 import { Command, Option } from '@commander-js/extra-typings';
 import {
+  ILlmToolsClientConfigLlamaCpp,
+  ILlmToolsClientConfigOllama,
+  LlamaCppModelEnum,
   LlmToolsBackendEnum,
   LlmToolsService,
   LlmToolsServiceConfig,
@@ -72,11 +75,14 @@ export async function cliCompletion(
         backendConfig = {
           backend: completionOptions.backend,
           serverOrigin: completionOptions.server,
+          model: LlamaCppModelEnum.QWEN_2_5_CODER,
         };
         break;
       case LlmToolsBackendEnum.OLLAMA:
         backendConfig = {
           backend: completionOptions.backend,
+          model: 'qwen2.5-coder',
+          serverOrigin: completionOptions.server,
         };
     }
     const client = new LlmToolsService(backendConfig);

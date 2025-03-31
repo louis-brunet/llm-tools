@@ -53,27 +53,66 @@ const backendToTest = {
       infill: '/infill',
       cliCompletion: '/completion',
     },
+    responses: {
+      infill: {
+        content: 'some-infill-content',
+        tokens_predicted: 42,
+      } satisfies LlamaCppInfillResponse,
+      cliCompletion: {
+        content: 'some-cli-completion-content',
+        generation_settings: {},
+        model: 'some-model',
+        prompt: 'some-prompt',
+        stop: true,
+        stop_type: 'eos',
+        stopping_word: '',
+        timings: {},
+        tokens: [],
+        tokens_cached: 0,
+        tokens_evaluated: 42,
+        truncated: false,
+      } satisfies LlamaCppCompletionResponse,
+    },
+    expected: {
+      infill: 'some-infill-content',
+      cliCompletion: 'some-cli-completion-content',
+    },
   },
   [LlmToolsBackendEnum.OLLAMA]: {
     endpoints: {
-      infill: '/infill',
-      cliCompletion: '/completion',
+      infill: '/api/generate',
+      cliCompletion: '/api/generate',
+    },
+    responses: {
+      infill: {
+        response: 'some-infill-response',
+      },
+      cliCompletion: {
+        response: 'some-cli-completion-response',
+      },
+    },
+    expected: {
+      infill: 'some-infill-response',
+      cliCompletion: 'some-cli-completion-response',
     },
   },
 } as const satisfies Record<
   LlmToolsBackendEnum,
-  { endpoints: { infill: string; cliCompletion: string } }
+  {
+    endpoints: { infill: string; cliCompletion: string };
+    responses: { infill: unknown; cliCompletion: unknown };
+    expected: { infill: string; cliCompletion: string };
+  }
 >;
 
 describe('cli (e2e)', () => {
-  for (const [backend, { endpoints }] of Object.entries(backendToTest)) {
+  for (const [backend, { endpoints, responses, expected }] of Object.entries(
+    backendToTest,
+  )) {
     describe(`with backend ${backend}`, () => {
       describe(`command infill`, () => {
         it('prints result to stdout with all optional aguments', async (t: TestContext) => {
-          const mockInfillResponse: LlamaCppInfillResponse = {
-            content: 'some-content',
-            tokens_predicted: 42,
-          };
+          const mockInfillResponse = responses.infill;
           const fetchMock = t.mock.method(global, 'fetch');
           fetchMock.mock.mockImplementation(() =>
             Promise.resolve(createMockResponse(mockInfillResponse)),
@@ -109,27 +148,14 @@ describe('cli (e2e)', () => {
           t.assert.strictEqual(stdoutWriteMock.mock.callCount(), 1);
           t.assert.strictEqual(
             stdoutWriteMock.mock.calls[0].arguments[0],
-            mockInfillResponse.content,
+            expected.infill,
           );
         });
       });
 
       describe('command cli-completion', () => {
         it('prints result to stdout with all optional aguments', async (t: TestContext) => {
-          const mockCliCompletionResponse: LlamaCppCompletionResponse = {
-            content: 'some-content',
-            generation_settings: {},
-            model: 'some-model',
-            prompt: 'some-prompt',
-            stop: true,
-            stop_type: 'eos',
-            stopping_word: '',
-            timings: {},
-            tokens: [],
-            tokens_cached: 0,
-            tokens_evaluated: 42,
-            truncated: false,
-          };
+          const mockCliCompletionResponse = responses.cliCompletion;
           const fetchMock = t.mock.method(global, 'fetch');
           fetchMock.mock.mockImplementation(() =>
             Promise.resolve(createMockResponse(mockCliCompletionResponse)),
@@ -164,7 +190,7 @@ describe('cli (e2e)', () => {
           t.assert.strictEqual(stdoutWriteMock.mock.callCount(), 1);
           t.assert.strictEqual(
             stdoutWriteMock.mock.calls[0].arguments[0],
-            mockCliCompletionResponse.content,
+            expected.cliCompletion,
           );
         });
       });
