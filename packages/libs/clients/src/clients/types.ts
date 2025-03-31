@@ -1,4 +1,5 @@
 import { ILlamaCppClientConfig } from './llama-cpp';
+import { IOllamaClientConfig as IOllamaClientConfig } from './ollama';
 
 export enum LlmToolsBackendEnum {
   LLAMA_CPP = 'llama-cpp',
@@ -14,16 +15,8 @@ export interface ILlmToolsClientConfigLlamaCpp extends ILlamaCppClientConfig {
   backend: LlmToolsBackendEnum.LLAMA_CPP;
 }
 
-// export type LlmToolsClientConfigOllama = {
-//   backend: LlmToolsBackendEnum.OLLAMA;
-//   serverOrigin: string;
-//   model: string;
-// };
-
-export interface ILlmToolsClientConfigOllama {
+export interface ILlmToolsClientConfigOllama extends IOllamaClientConfig {
   backend: LlmToolsBackendEnum.OLLAMA;
-  serverOrigin: string;
-  model: string;
 }
 
 export type LlmToolsServiceConfig =

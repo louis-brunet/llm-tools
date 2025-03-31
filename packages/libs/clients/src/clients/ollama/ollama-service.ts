@@ -8,7 +8,7 @@ import type {
   ILlmToolsService,
 } from '../types';
 import { OllamaClient } from './ollama-client';
-import { ILlmToolsOllamaConfig } from './types';
+import { IOllamaClientConfig } from './types';
 
 interface IOllamaManualInfillRequest extends ILlmToolsInfillRequest {
   system?: string | undefined;
@@ -24,7 +24,7 @@ export class OllamaService implements ILlmToolsService {
     return (this._modelAdapter ??= this.createModelAdapter(this.config.model));
   }
 
-  constructor(private readonly config: ILlmToolsOllamaConfig) {
+  constructor(private readonly config: IOllamaClientConfig) {
     this.client = new OllamaClient(config);
   }
 

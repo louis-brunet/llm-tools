@@ -1,10 +1,10 @@
 import { GenerateRequest, GenerateResponse, Ollama } from 'ollama';
-import { ILlmToolsOllamaConfig } from './types';
+import { IOllamaClientConfig } from './types';
 
 export class OllamaClient {
   private readonly ollama: Ollama;
 
-  constructor(config: ILlmToolsOllamaConfig) {
+  constructor(config: IOllamaClientConfig) {
     this.ollama = new Ollama({ host: config.serverOrigin });
   }
 
