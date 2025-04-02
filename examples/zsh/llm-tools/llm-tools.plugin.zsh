@@ -1,3 +1,5 @@
+# vim:ft=zsh:
+
 #####
 # COMMON
 #####
@@ -35,7 +37,7 @@ _llm_tools_debounce_seconds() {
     # Execute the command if we are still the latest one waiting
     if grep -q "$$" "$debounce_file" 2>/dev/null; then
       rm "$debounce_file";
-      $@
+      $@ || return 1
     fi
 }
 
@@ -79,7 +81,10 @@ _llm_tools_trigger_cli_completion() {
 # ZLE WIDGET
 #####
 
-function llm-completion-widget() {
+LLM_TOOLS_WIDGET_KEYBIND="${LLM_TOOLS_WIDGET_KEYBIND:-^N}"
+LLM_TOOLS_WIDGET_NAME="{$LLM_TOOLS_WIDGET_NAME:-llm-completion-widget}"
+
+function "$LLM_TOOLS_WIDGET_NAME"() {
   # Get text from current cursor position to beginning of line
   local prefix=${BUFFER[1, $CURSOR]}
 
@@ -90,9 +95,9 @@ function llm-completion-widget() {
   LBUFFER+="$suggestion"
 }
 
-function _configure-llm-tools-completion() {
-  local _widget="llm-completion-widget"
-  local _widget_keybind="^N"
+function _configure_llm_tools_widget() {
+  local _widget="$LLM_TOOLS_WIDGET_NAME"
+  local _widget_keybind="$LLM_TOOLS_WIDGET_KEYBIND"
 
   # Bind widget
   zle -N "$_widget"
@@ -111,15 +116,17 @@ function _configure-llm-tools-completion() {
 # Example strategy implementation:
 # https://github.com/zsh-users/zsh-autosuggestions/blob/master/src/strategies/match_prev_cmd.zsh
 
-LLM_TOOLS_ZSH_AUTOSUGGESTIONS_STRATEGY="${LLM_TOOLS_ZSH_AUTOSUGGESTIONS_STRATEGY:-custom_llm_tools}"
+LLM_TOOLS_ZSH_AUTOSUGGESTIONS_STRATEGY="${LLM_TOOLS_ZSH_AUTOSUGGESTIONS_STRATEGY:-llm_tools}"
+LLM_TOOLS_ZSH_AUTOSUGGESTIONS_DEBOUNCE_SECONDS_FLOAT="${LLM_TOOLS_ZSH_AUTOSUGGESTIONS_DEBOUNCE_SECONDS_FLOAT:-0.100}"
 
 _zsh_autosuggest_strategy_"$LLM_TOOLS_ZSH_AUTOSUGGESTIONS_STRATEGY"() {
-# TODO: better and configuratble debouncing
-  # typeset -g suggestion="${1} TODO: implement $LLM_TOOLS_ZSH_AUTOSUGGESTIONS_STRATEGY strategy"
-  # typeset -g suggestion="${1}$(_llm_tools_trigger_cli_completion "${1}")"
-  # typeset -g suggestion="${1}$(_llm_tools_debounce 750 _llm_tools_trigger_cli_completion "${1}")"
-  local debounced_suggestion="$(_llm_tools_debounce_seconds 0.750 _llm_tools_trigger_cli_completion "${1}")"
-  if [[ debounced_suggestion = "" ]]; then
+  local prefix="$1"
+  local debounced_suggestion=$(
+    _llm_tools_debounce_seconds \
+      "$LLM_TOOLS_ZSH_AUTOSUGGESTIONS_DEBOUNCE_SECONDS_FLOAT" \
+      _llm_tools_trigger_cli_completion "${prefix}" 2>/dev/null
+  )
+  if [[ -z "$debounced_suggestion" ]]; then
     return 0
   fi
   typeset -g suggestion="${1}${debounced_suggestion}"
@@ -132,5 +139,5 @@ _zsh_autosuggest_strategy_"$LLM_TOOLS_ZSH_AUTOSUGGESTIONS_STRATEGY"() {
 
 _script_path=$(realpath "$0")
 _llm_tools_script_dir=$(dirname "$_script_path")
-_configure-llm-tools-completion
-unset -f _configure-llm-tools-completion
+_configure_llm_tools_widget
+unset -f _configure_llm_tools_widget
