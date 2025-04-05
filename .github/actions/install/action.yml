@@ -1,5 +1,9 @@
 name: Install
 description: Install yarn application and dependencies
+inputs:
+  node-version:
+    default: "22.14"
+    description: Version of Node.js to use
 
 runs:
   using: composite
@@ -9,6 +13,7 @@ runs:
     - uses: actions/setup-node@v4
       with:
         cache: yarn
+        node-version: ${{ inputs.node-version }}
     - run: yarn install --immutable
       shell: sh
 
