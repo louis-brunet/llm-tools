@@ -3,6 +3,7 @@ description: Install yarn application and dependencies
 inputs:
   node-version:
     default: "22.14"
+    required: true
     description: Version of Node.js to use
 
 runs:

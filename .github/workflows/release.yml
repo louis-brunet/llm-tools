@@ -16,6 +16,8 @@ jobs:
 
   build_zsh_plugin:
     name: Build zsh plugin
+    needs:
+      - test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
