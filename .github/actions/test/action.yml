@@ -10,7 +10,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: .github/actions/install
+    - uses: ./.github/actions/install
       with:
         node-version: ${{ inputs.node-version }}
     - run: yarn workspaces foreach --recursive --topological-dev --from="${{ inputs.workspace-from }}" run build
