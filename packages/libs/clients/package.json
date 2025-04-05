@@ -2,13 +2,19 @@
   "name": "@llm-tools/clients",
   "version": "0.0.1",
   "main": "build/index.js",
+  "files": [
+    "build",
+    "package.json",
+    "README.md"
+  ],
   "scripts": {
     "lint": "yarn eslint \"{src,tests?}/**/*.ts\" --fix",
     "build": "yarn tsc --project tsconfig.build.json",
     "build:watch": "yarn run build --watch",
     "test": "yarn run test:_base '{src,test{,s}}/**/*.test.ts'",
     "test:debug": "yarn run test:_base --inspect '{src,test{,s}}/**/*.test.ts'",
-    "test:_base": "node --experimental-test-module-mocks --experimental-test-coverage --test-coverage-include='src/**/*' --test-coverage-exclude='**/{*.test,types}.ts' --test-coverage-branches=80 --test-coverage-lines=80 --enable-source-maps --require ts-node/register --test"
+    "test:_base": "node --experimental-test-module-mocks --experimental-test-coverage --test-coverage-include='src/**/*' --test-coverage-exclude='**/{*.test,types}.ts' --test-coverage-branches=80 --test-coverage-lines=80 --enable-source-maps --require ts-node/register --test",
+    "prepack": "yarn run build"
   },
   "author": "Louis Brunet",
   "license": "MIT",

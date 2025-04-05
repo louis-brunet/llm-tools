@@ -1,0 +1,70 @@
+name: release
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_zsh_plugin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - working-directory: examples/zsh
+        run: tar -czvf zsh-plugin.tgz llm-tools
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zsh-plugin-artifact
+          path: examples/zsh/zsh-plugin.tgz
+          if-no-files-found: error
+          retention-days: 1
+
+  build_cli:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          cache: yarn
+      - run: yarn install --immutable
+      - run: yarn run bundle:cli
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cli-artifact
+          path: packages/apps/cli/build/bundle.js
+          if-no-files-found: error
+          retention-days: 1
+
+  publish_release:
+    needs:
+      - build_cli
+      - build_zsh_plugin
+    runs-on: ubuntu-latest
+    # permissions:
+    #   contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/download-artifact@v4
+      - name: Rename artifacts
+        run: |
+          mv cli-artifact/bundle.js cli-artifact/cli.js
+      - name: Create GitHub release
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          release_tag="$GITHUB_SHA"
+          release_target="$GITHUB_SHA"
+          release_title="CLI - $GITHUB_SHA"
+          gh release create \
+            "$release_tag" \
+            --target "$release_target" \
+            --title "$release_title" \
+            --prerelease \
+            cli-artifact/cli.js \
+            zsh-plugin-artifact/zsh-plugin.tgz

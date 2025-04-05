@@ -50,7 +50,7 @@ _llm_tools_debounce_seconds() {
 _llm_tools_trigger_cli_completion() {
   local prefix="$1"
   local suffix="$2"
-  local LLM_TOOLS_CLI_COMPLETION_COMMAND="${LLM_TOOLS_CLI_COMPLETION_COMMAND:-$_llm_tools_script_dir/../../../packages/apps/cli/build/main.js}"
+  local LLM_TOOLS_CLI_COMPLETION_COMMAND="${LLM_TOOLS_CLI_COMPLETION_COMMAND:-llm-tools}"
 
   local pad_starting_hypen_pattern='s/^\(-\)/ \1/'
 
@@ -152,7 +152,7 @@ _zsh_autosuggest_strategy_"$LLM_TOOLS_ZSH_AUTOSUGGESTIONS_STRATEGY"() {
 # main
 #####
 
-_script_path=$(realpath "$0")
-_llm_tools_script_dir=$(dirname "$_script_path")
+_llm_tools_script_path=$(realpath "$0")
+_llm_tools_script_dir=$(dirname "$_llm_tools_script_path")
 _configure_llm_tools_widget
 unset -f _configure_llm_tools_widget
