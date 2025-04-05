@@ -10,8 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/install
-      - run: yarn run test
+      - uses: ./.github/actions/test
+        with:
+          workspace-from: 'packages/apps/*'
 
   build_zsh_plugin:
     name: Build zsh plugin

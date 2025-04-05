@@ -1,0 +1,21 @@
+name: Test
+description: Test workspace and its dependencies
+inputs:
+  node-version:
+    description: Version of Node.js to use
+  workspace-from:
+    description: Yarn workspace specification, e.g. "@llm-tools/cli", "packages/apps/*"
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: .github/actions/install
+      with:
+        node-version: ${{ inputs.node-version }}
+    - run: yarn workspaces foreach --recursive --topological-dev --from="${{ inputs.workspace-from }}" run build
+      shell: sh
+    - run: yarn workspaces foreach --recursive --topological-dev --from="${{ inputs.workspace-from }}" run test
+      shell: sh
+
+
