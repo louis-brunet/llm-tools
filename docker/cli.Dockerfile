@@ -14,7 +14,7 @@ WORKDIR /app
 RUN cp /dist/packages/apps/cli/build/bundle.js ./bundle.js
 
 
-FROM node:22-alpine
+FROM node:22-alpine AS runner
 COPY --from=builder /app /app
 WORKDIR /app
 ENV NODE_ENV=production
