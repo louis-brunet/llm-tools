@@ -9,7 +9,8 @@ jobs:
     name: Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/install.yml
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/install
       - run: yarn run test
 
   build_zsh_plugin:
@@ -34,7 +35,8 @@ jobs:
       - test
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/install.yml
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/install
       - run: yarn run build:cli
       - run: yarn run bundle:cli
       - uses: actions/upload-artifact@v4
