@@ -31,7 +31,7 @@ jobs:
         run: tar -czvf zsh-plugin.tgz llm-tools
       - uses: actions/upload-artifact@v4
         with:
-          name: zsh-plugin-artifact
+          name: zsh-plugin-release-asset
           path: examples/zsh/zsh-plugin.tgz
           if-no-files-found: error
           retention-days: 1
@@ -48,7 +48,7 @@ jobs:
       - run: yarn run bundle:cli
       - uses: actions/upload-artifact@v4
         with:
-          name: cli-artifact
+          name: cli-release-asset
           path: packages/apps/cli/build/bundle.js
           if-no-files-found: error
           retention-days: 1
@@ -161,9 +161,13 @@ jobs:
         with:
           fetch-depth: 1
       - uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          pattern: "*-release-asset"
+          merge-multiple: true
       - name: Rename artifacts
         run: |
-          mv cli-artifact/bundle.js cli-artifact/cli.js
+          mv cli-release-asset/bundle.js cli-release-asset/cli.js
       - name: Create GitHub release
         env:
           GH_REPO: ${{ github.repository }}
@@ -177,5 +181,4 @@ jobs:
             --target "$release_target" \
             --title "$release_title" \
             --prerelease \
-            cli-artifact/cli.js \
-            zsh-plugin-artifact/zsh-plugin.tgz
+            release-assets/*
