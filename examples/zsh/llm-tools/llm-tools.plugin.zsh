@@ -88,7 +88,7 @@ _llm_tools_trigger_cli_completion() {
 #####
 
 LLM_TOOLS_WIDGET_KEYBIND="${LLM_TOOLS_WIDGET_KEYBIND:-^N}"
-LLM_TOOLS_WIDGET_NAME="{$LLM_TOOLS_WIDGET_NAME:-llm-completion-widget}"
+LLM_TOOLS_WIDGET_NAME="${$LLM_TOOLS_WIDGET_NAME:-llm-completion-widget}"
 
 function "$LLM_TOOLS_WIDGET_NAME"() {
   # Get text from current cursor position to beginning of line
