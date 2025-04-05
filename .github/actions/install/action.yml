@@ -1,8 +1,8 @@
 name: Install
 description: Install yarn application and dependencies
+
 inputs:
   node-version:
-    default: "22.14"
     required: true
     description: Version of Node.js to use
 
@@ -17,4 +17,3 @@ runs:
         node-version: ${{ inputs.node-version }}
     - run: yarn install --immutable
       shell: sh
-

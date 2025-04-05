@@ -3,6 +3,7 @@ description: Test workspace and its dependencies
 inputs:
   node-version:
     description: Version of Node.js to use
+    required: true
   workspace-from:
     description: Yarn workspace specification, e.g. "@llm-tools/cli", "packages/apps/*"
     required: true

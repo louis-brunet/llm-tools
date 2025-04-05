@@ -8,10 +8,14 @@ jobs:
   test:
     name: Tests
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ["22.14"]
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/test
         with:
+          node-version: ${{ matrix.node-version }}
           workspace-from: 'packages/apps/*'
 
   build_zsh_plugin:
