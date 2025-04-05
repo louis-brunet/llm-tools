@@ -88,7 +88,7 @@ _llm_tools_trigger_cli_completion() {
 #####
 
 LLM_TOOLS_WIDGET_KEYBIND="${LLM_TOOLS_WIDGET_KEYBIND:-^N}"
-LLM_TOOLS_WIDGET_NAME="${$LLM_TOOLS_WIDGET_NAME:-llm-completion-widget}"
+LLM_TOOLS_WIDGET_NAME="${LLM_TOOLS_WIDGET_NAME:-llm-completion-widget}"
 
 function "$LLM_TOOLS_WIDGET_NAME"() {
   # Get text from current cursor position to beginning of line
@@ -97,7 +97,13 @@ function "$LLM_TOOLS_WIDGET_NAME"() {
   # Get text from cursor position to end of line (suffix)
   local suffix=${BUFFER[$CURSOR + 1, -1]}
 
+  _llm_tools_debug "[$0] prefix: $prefix"
+  _llm_tools_debug "[$0] suffix: $suffix"
+
   local suggestion=$(_llm_tools_trigger_cli_completion "$prefix" "$suffix")
+
+  _llm_tools_debug "[$0] suggestion: $suggestion"
+
   LBUFFER+="$suggestion"
 }
 
