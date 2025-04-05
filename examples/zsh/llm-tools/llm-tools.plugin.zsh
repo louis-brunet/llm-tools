@@ -4,6 +4,12 @@
 # COMMON
 #####
 
+_llm_tools_debug() {
+  if [[ -n "$LLM_TOOLS_DEBUG" ]]; then
+    echo "$@" >&2
+  fi
+}
+
 _llm_tools_debounce_seconds() {
   # Check if arguments are provided
     if [ $# -lt 2 ]; then
@@ -121,15 +127,18 @@ LLM_TOOLS_ZSH_AUTOSUGGESTIONS_DEBOUNCE_SECONDS_FLOAT="${LLM_TOOLS_ZSH_AUTOSUGGES
 
 _zsh_autosuggest_strategy_"$LLM_TOOLS_ZSH_AUTOSUGGESTIONS_STRATEGY"() {
   local prefix="$1"
+  _llm_tools_debug "[$0] prefix: '$prefix'"
   local debounced_suggestion=$(
     _llm_tools_debounce_seconds \
       "$LLM_TOOLS_ZSH_AUTOSUGGESTIONS_DEBOUNCE_SECONDS_FLOAT" \
       _llm_tools_trigger_cli_completion "${prefix}" 2>/dev/null
   )
+  _llm_tools_debug "[$0] debounced_suggestion: '$debounced_suggestion'"
   if [[ -z "$debounced_suggestion" ]]; then
     return 0
   fi
   typeset -g suggestion="${1}${debounced_suggestion}"
+  _llm_tools_debug "[$0] suggestion: '$suggestion'"
 }
 
 
