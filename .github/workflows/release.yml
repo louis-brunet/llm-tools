@@ -167,7 +167,7 @@ jobs:
           merge-multiple: true
       - name: Rename artifacts
         run: |
-          mv cli-release-asset/bundle.js cli-release-asset/cli.js
+          mv release-assets/bundle.js release-assets/cli.js
       - name: Create GitHub release
         env:
           GH_REPO: ${{ github.repository }}
