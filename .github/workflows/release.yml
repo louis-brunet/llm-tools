@@ -6,6 +6,7 @@ on:
 
 jobs:
   build_zsh_plugin:
+    name: Build zsh plugin
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,8 +20,15 @@ jobs:
           path: examples/zsh/zsh-plugin.tgz
           if-no-files-found: error
           retention-days: 1
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: zsh-plugin-artifact
+      #     path: examples/zsh/llm-tools
+      #     if-no-files-found: error
+      #     retention-days: 1
 
   build_cli:
+    name: Build CLI
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,6 +39,7 @@ jobs:
         with:
           cache: yarn
       - run: yarn install --immutable
+      - run: yarn run build:cli
       - run: yarn run bundle:cli
       - uses: actions/upload-artifact@v4
         with:
@@ -40,6 +49,7 @@ jobs:
           retention-days: 1
 
   publish_release:
+    name: Publish release
     needs:
       - build_cli
       - build_zsh_plugin
