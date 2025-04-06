@@ -22,7 +22,7 @@ jobs:
         if: github.event_name == 'push'
         id: get-tag-name
         run: |
-          tag_name=${{ github.ref_name == github.event.repository.default_branch ? 'next' : github.ref_name }}
+          tag_name=${{ github.ref_name == github.event.repository.default_branch && 'next' || github.ref_name }}
 
           is_prerelease=
           prerelease_version_tag_pattern='^(next|v[0-9]+\.[0-9]+\.[0-9]+-.*)$'
@@ -41,7 +41,7 @@ jobs:
               | sed -E 's/^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+-//'
             )
           fi
-          # app_version_suffix=${{ github.ref_name == github.event.repository.default_branch ? 'dev' : '' }}
+          # app_version_suffix=${{ github.ref_name == github.event.repository.default_branch && 'dev' || '' }}
           # if [[ -z "$app_version_suffix" ]]; then
           #   untrimmed="${{ github.ref_name }}"
           #   trimmed=$(echo "$untrimmed" | sed -E 's/^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+-//')
@@ -214,7 +214,7 @@ jobs:
             })
       - name: Create release
         env:
-          PRERELEASE: "${{ needs.setup.outputs.is-prerelease ? '--prerelease' : '' }}"
+          PRERELEASE: "${{ needs.setup.outputs.is-prerelease && '--prerelease' || '' }}"
         run: |
           release_tag="${TAG_NAME:-$(git rev-parse --short "$GITHUB_SHA")}"
           release_target="$GITHUB_SHA"
