@@ -128,10 +128,14 @@ function _configure_llm_tools_widget() {
 # Example strategy implementation:
 # https://github.com/zsh-users/zsh-autosuggestions/blob/master/src/strategies/match_prev_cmd.zsh
 
+LLM_TOOLS_ZSH_AUTOSUGGESTIONS_DISABLE="${LLM_TOOLS_ZSH_AUTOSUGGESTIONS_DISABLE}"
 LLM_TOOLS_ZSH_AUTOSUGGESTIONS_STRATEGY="${LLM_TOOLS_ZSH_AUTOSUGGESTIONS_STRATEGY:-llm_tools}"
-LLM_TOOLS_ZSH_AUTOSUGGESTIONS_DEBOUNCE_SECONDS_FLOAT="${LLM_TOOLS_ZSH_AUTOSUGGESTIONS_DEBOUNCE_SECONDS_FLOAT:-0.500}"
+LLM_TOOLS_ZSH_AUTOSUGGESTIONS_DEBOUNCE_SECONDS_FLOAT="${LLM_TOOLS_ZSH_AUTOSUGGESTIONS_DEBOUNCE_SECONDS_FLOAT:-0.300}"
 
 _zsh_autosuggest_strategy_"$LLM_TOOLS_ZSH_AUTOSUGGESTIONS_STRATEGY"() {
+  if [[ -n "$LLM_TOOLS_ZSH_AUTOSUGGESTIONS_DISABLE" ]]; then
+    return 0
+  fi
   local prefix="$1"
   _llm_tools_debug "[$0] prefix: '$prefix'"
   local debounced_suggestion=$(
