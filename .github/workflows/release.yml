@@ -54,7 +54,7 @@ jobs:
 
   # SOURCE: https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-docker-images#publishing-images-to-github-packages
   build_and_push_image:
-    name: Docker build image and push to registry
+    name: Publish docker image
     runs-on: ubuntu-latest
     needs:
       - test
