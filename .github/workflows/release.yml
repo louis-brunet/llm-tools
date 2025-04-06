@@ -1,4 +1,4 @@
-name: release
+name: Create release
 on:
   push:
     branches:
@@ -39,6 +39,8 @@ jobs:
     needs:
       - test
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: production
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/install
@@ -69,7 +71,7 @@ jobs:
       #
     env:
       REGISTRY: ghcr.io
-      IMAGE_NAME: ${{ github.repository }}
+      IMAGE_NAME: ${{ github.repository }}-cli
       DOCKERFILE: ./docker/cli.Dockerfile
     steps:
       - name: Checkout repository
