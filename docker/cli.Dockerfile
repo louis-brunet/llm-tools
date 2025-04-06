@@ -6,9 +6,8 @@ COPY ./packages/libs ./packages/libs
 COPY ./package.json ./package.json
 COPY ./tsconfig.json ./tsconfig.json
 COPY ./.yarnrc.yml ./.yarnrc.yml
-
-RUN yarn install && yarn run build:cli && yarn run bundle:cli
-
+ENV NODE_ENV=production
+RUN yarn install && yarn run build:cli
 WORKDIR /app
 RUN cp /dist/packages/apps/cli/build/bundle.js ./bundle.js
 
