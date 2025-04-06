@@ -36,20 +36,22 @@ jobs:
         id: get-version
         run: |
           if [[ "${{ steps.get-tag-name.outputs.is-prerelease }}" = true ]]; then
-            app_version_suffix=$(
-              echo "${{ steps.get-tag-name.outputs.release-tag-name }}" \
-              | sed -E 's/^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+-//'
-            )
+            app_version_suffix=${{ github.ref_name == github.event.repository.default_branch && 'dev-$(git rev-parse --short "$GITHUB_SHA")' || '' }}
+            if [[ -z "$app_version_suffix" ]]; then
+              app_version_suffix=$(
+                echo "${{ steps.get-tag-name.outputs.release-tag-name }}" \
+                | sed -E 's/^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+-//'
+              )
+            fi
           fi
-          # app_version_suffix=${{ github.ref_name == github.event.repository.default_branch && 'dev' || '' }}
-          # if [[ -z "$app_version_suffix" ]]; then
-          #   untrimmed="${{ github.ref_name }}"
-          #   trimmed=$(echo "$untrimmed" | sed -E 's/^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+-//')
-          #   if [[ "$trimmed" != "$untrimmed" ]] && [[ -n "$trimmed" ]]; then
-          #     app_version_suffix="$trimmed"
-          #   fi
-          # fi
+
+          app_version=$(
+            echo "${{ steps.get-tag-name.outputs.release-tag-name }}" \
+            | grep --only-matching -E '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+'
+          )
+
           echo "app-version-suffix=$app_version_suffix" >> $GITHUB_OUTPUT
+          echo "app-version=$app_version" >> $GITHUB_OUTPUT
 
   test:
     name: Run tests
@@ -93,6 +95,7 @@ jobs:
       - uses: ./.github/actions/install
       - name: Build CLI bundle
         env:
+          LLM_TOOLS_BUILD_APP_VERSION: '${{ needs.setup.outputs.app-version }}'
           LLM_TOOLS_BUILD_APP_VERSION_SUFFIX: '${{ needs.setup.outputs.app-version-suffix }}'
         run: yarn run build:cli
       - name: Upload CLI bundle artifact
@@ -152,6 +155,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
+            LLM_TOOLS_BUILD_APP_VERSION=${{ needs.setup.outputs.app-version }}
             LLM_TOOLS_BUILD_APP_VERSION_SUFFIX=${{ needs.setup.outputs.app-version-suffix }}
       # This step generates an artifact attestation for the image, which is an unforgeable statement about where and how it was built. It increases supply chain security for people who consume the image. For more information, see [Using artifact attestations to establish provenance for builds](/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds).
       - name: Generate artifact attestation
