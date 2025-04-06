@@ -148,11 +148,23 @@ jobs:
           gh release delete "$TAG_NAME" --yes || true
       - if: env.TAG_NAME == 'next'
         name: Update git tag 'next'
-        run: |
-          git tag -d next || true
-          git push origin :refs/tags/next || true
-          git tag -fa next -m "Latest development build"
-          git push origin :refs/tags/next
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ env.TAG_NAME }}',
+              sha: context.sha
+            }).catch(err => {
+              if (err.status !== 422) throw err;
+              github.rest.git.updateRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'tags/${{ env.TAG_NAME }}',
+                sha: context.sha
+              });
+            })
       - name: Create release
         run: |
           release_tag="${TAG_NAME:-$(git rev-parse --short "$GITHUB_SHA")}"
