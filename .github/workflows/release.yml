@@ -48,7 +48,7 @@ jobs:
           app_version=$(
             echo "${{ steps.get-tag-name.outputs.release-tag-name }}" \
             | grep --only-matching -E '[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+'
-          )
+          ) || true
 
           echo "app-version-suffix=$app_version_suffix" >> $GITHUB_OUTPUT
           echo "app-version=$app_version" >> $GITHUB_OUTPUT
