@@ -149,7 +149,7 @@ jobs:
         run: |
           prerelease_version_tag_pattern='^(next|v[0-9]+\\.[0-9]+\\.[0-9]+\\.-.*)$'
           if [[ "$TAG_NAME" =~ $prerelease_version_tag_pattern ]]; then
-          echo 'PRERELEASE=--prerelease' >> $GITHUB_ENV
+            echo 'PRERELEASE=--prerelease' >> $GITHUB_ENV
           fi
       - if: env.TAG_NAME == 'next'
         name: Delete 'next' prerelease
