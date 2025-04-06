@@ -118,6 +118,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      GH_REPO: ${{ github.repository }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -143,9 +146,6 @@ jobs:
           echo 'PRERELEASE=--prerelease' >> $GITHUB_ENV
           gh release delete "$TAG_NAME" --yes || true
       - name: Create release
-        env:
-          GH_REPO: ${{ github.repository }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           release_tag="${TAG_NAME:-$(git rev-parse --short "$GITHUB_SHA")}"
           release_target="$GITHUB_SHA"
