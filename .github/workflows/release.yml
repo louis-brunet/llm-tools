@@ -8,6 +8,49 @@ on:
       - v[0-9]+.[0-9]+.[0-9]+-**
 
 jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      app-version-suffix: ${{ steps.get-version.outputs.app-version-suffix }}
+      release-tag-name: ${{ steps.get-tag-name.outputs.release-tag-name }}
+      is-prerelease: ${{ steps.get-tag-name.outputs.is-prerelease  }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Get release tag name
+        if: github.event_name == 'push'
+        id: get-tag-name
+        run: |
+          tag_name=${{ github.ref_name == github.event.repository.default_branch ? 'next' : github.ref_name }}
+
+          is_prerelease=
+          prerelease_version_tag_pattern='^(next|v[0-9]+\.[0-9]+\.[0-9]+-.*)$'
+          if [[ "$tag_name" =~ $prerelease_version_tag_pattern ]]; then
+            is_prerelease=true
+          fi
+
+          echo "release-tag-name=$tag_name" >> $GITHUB_OUTPUT
+          echo "is-prerelease=$is_prerelease" >> $GITHUB_OUTPUT
+      - name: Get version suffix
+        id: get-version
+        run: |
+          if [[ "${{ steps.get-tag-name.outputs.is-prerelease }}" = true ]]; then
+            app_version_suffix=$(
+              echo "${{ steps.get-tag-name.outputs.release-tag-name }}" \
+              | sed -E 's/^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+-//'
+            )
+          fi
+          # app_version_suffix=${{ github.ref_name == github.event.repository.default_branch ? 'dev' : '' }}
+          # if [[ -z "$app_version_suffix" ]]; then
+          #   untrimmed="${{ github.ref_name }}"
+          #   trimmed=$(echo "$untrimmed" | sed -E 's/^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+-//')
+          #   if [[ "$trimmed" != "$untrimmed" ]] && [[ -n "$trimmed" ]]; then
+          #     app_version_suffix="$trimmed"
+          #   fi
+          # fi
+          echo "app-version-suffix=$app_version_suffix" >> $GITHUB_OUTPUT
+
   test:
     name: Run tests
     runs-on: ubuntu-latest
@@ -41,6 +84,7 @@ jobs:
     name: Build CLI
     needs:
       - test
+      - setup
     runs-on: ubuntu-latest
     env:
       NODE_ENV: production
@@ -48,6 +92,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/install
       - name: Build CLI bundle
+        env:
+          APP_VERSION_SUFFIX: '${{ needs.setup.outputs.app-version-suffix }}'
         run: yarn run build:cli
       - name: Upload CLI bundle artifact
         uses: actions/upload-artifact@v4
@@ -62,6 +108,7 @@ jobs:
     name: Publish docker image
     runs-on: ubuntu-latest
     needs:
+      - setup
       - test
       - build_cli
     #   - build_zsh_plugin
@@ -98,6 +145,8 @@ jobs:
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@v6
+        env:
+          APP_VERSION_SUFFIX: '${{ needs.setup.outputs.app-version-suffix }}'
         with:
           context: .
           file: ${{ env.DOCKERFILE }}
@@ -115,6 +164,7 @@ jobs:
   publish_release:
     name: Publish release
     needs:
+      - setup
       - build_cli
       - build_zsh_plugin
       - build_and_push_image
@@ -131,26 +181,14 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: release-assets
-          pattern: "*-release-asset"
+          pattern: '*-release-asset'
           merge-multiple: true
       - name: Rename artifacts
         run: |
           mv release-assets/bundle.js release-assets/cli.js
-      - if: github.event_name == 'push'
-        name: Get tag name
+      - name: Get tag name
         run: |
-          TAG_NAME=${{ github.ref_name }}
-          if [[ "$TAG_NAME" = "${{ github.event.repository.default_branch }}" ]]; then
-            TAG_NAME=next
-          fi
-          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
-      - if: github.event_name == 'push'
-        name: Check for prerelease pattern
-        run: |
-          prerelease_version_tag_pattern='^(next|v[0-9]+\\.[0-9]+\\.[0-9]+\\.-.*)$'
-          if [[ "$TAG_NAME" =~ $prerelease_version_tag_pattern ]]; then
-            echo 'PRERELEASE=--prerelease' >> $GITHUB_ENV
-          fi
+          echo "TAG_NAME=${{ needs.setup.outputs.release-tag-name }}" >> $GITHUB_ENV
       - if: env.TAG_NAME == 'next'
         name: Delete 'next' prerelease
         run: |
@@ -175,6 +213,8 @@ jobs:
               });
             })
       - name: Create release
+        env:
+          PRERELEASE: "${{ needs.setup.outputs.is-prerelease ? '--prerelease' : '' }}"
         run: |
           release_tag="${TAG_NAME:-$(git rev-parse --short "$GITHUB_SHA")}"
           release_target="$GITHUB_SHA"
