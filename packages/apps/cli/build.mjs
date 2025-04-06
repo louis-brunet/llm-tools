@@ -15,14 +15,8 @@ await esbuild.build({
   define: {
     // Optional: define global constants
     // 'process.env.NODE_ENV': `"${process.env.NODE_ENV || 'development'}"`,
-    '__BUILD_CONFIG.APP_NAME': process.env.APP_NAME
-      ? `"${process.env.APP_NAME}"`
-      : '__BUILD_CONFIG.APP_NAME',
-    '__BUILD_CONFIG.APP_VERSION': process.env.APP_VERSION
-      ? `"${process.env.APP_VERSION}"`
-      : '__BUILD_CONFIG.APP_VERSION',
-    '__BUILD_CONFIG.APP_VERSION_SUFFIX': process.env.APP_VERSION_SUFFIX
-      ? `"${process.env.APP_VERSION_SUFFIX}"`
-      : '__BUILD_CONFIG.APP_VERSION_SUFFIX',
+    'process.env.LLM_TOOLS_BUILD_APP_VERSION_SUFFIX': `"${process.env.LLM_TOOLS_BUILD_APP_VERSION_SUFFIX || ''}"`,
+    'process.env.LLM_TOOLS_BUILD_APP_VERSION': `"${process.env.LLM_TOOLS_BUILD_APP_VERSION || ''}"`,
+    'process.env.LLM_TOOLS_BUILD_APP_NAME': `"${process.env.LLM_TOOLS_BUILD_APP_NAME || ''}"`,
   },
 });

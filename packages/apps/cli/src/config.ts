@@ -3,19 +3,19 @@ type ReplaceHyphensWithUnderscores<T extends string> =
     ? `${First}_${ReplaceHyphensWithUnderscores<Rest>}`
     : T;
 
-const __BUILD_CONFIG = {
-  APP_NAME: 'llm-tools',
-  APP_VERSION: '0.0.1',
-  APP_VERSION_SUFFIX: '' as string,
-} as const;
+const buildConfig = {
+  appName: process.env.LLM_TOOLS_BUILD_APP_NAME || 'llm-tools',
+  appVersion: process.env.LLM_TOOLS_BUILD_APP_VERSION || '0.0.1',
+  appVersionSuffix: process.env.LLM_TOOLS_BUILD_APP_VERSION_SUFFIX || '',
+};
 
-const appVersionSuffix = __BUILD_CONFIG.APP_VERSION_SUFFIX
-  ? `-${__BUILD_CONFIG.APP_VERSION_SUFFIX}`
+const appVersionSuffix = buildConfig.appVersionSuffix
+  ? `-${buildConfig.appVersionSuffix}`
   : '';
 
 export const APP_CONFIG = {
-  appName: __BUILD_CONFIG.APP_NAME,
-  appVersion: `${__BUILD_CONFIG.APP_VERSION}${appVersionSuffix}`,
+  appName: buildConfig.appName,
+  appVersion: `${buildConfig.appVersion}${appVersionSuffix}`,
 } as const;
 
 const upperCaseAppName = APP_CONFIG.appName.toUpperCase() as Uppercase<
