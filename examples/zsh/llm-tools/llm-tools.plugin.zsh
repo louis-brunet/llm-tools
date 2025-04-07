@@ -51,6 +51,8 @@ _llm_tools_trigger_cli_completion() {
   local prefix="$1"
   local suffix="$2"
   local LLM_TOOLS_CLI_COMPLETION_COMMAND="${LLM_TOOLS_CLI_COMPLETION_COMMAND:-llm-tools}"
+  local LLM_TOOLS_CLI_COMPLETION_MATCHING_COMMAND_COUNT="${LLM_TOOLS_CLI_COMPLETION_MATCHING_COMMAND_COUNT:-5}"
+  local LLM_TOOLS_CLI_COMPLETION_RECENT_COMMAND_COUNT="${LLM_TOOLS_CLI_COMPLETION_RECENT_COMMAND_COUNT:-10}"
 
   local pad_starting_hypen_pattern='s/^\(-\)/ \1/'
 
@@ -60,14 +62,13 @@ _llm_tools_trigger_cli_completion() {
   # NOTE: `${=myvar}` trims a string in zsh
   if [[ "${=prefix}" != "" ]] || [[ "${=suffix}" != "" ]]; then
     local matching_commands_pattern="*$prefix*$suffix*"
-    local matching_command_count=5
     matching_commands=("${(@f)$(fc -l -n -m -r "*$prefix*$suffix" 1 2>/dev/null \
-      | head -n "$matching_command_count" \
+      | head -n "$LLM_TOOLS_CLI_COMPLETION_MATCHING_COMMAND_COUNT" \
       | tac \
       | sed "$pad_starting_hypen_pattern")}")
   fi
-  local recent_command_count=25
-  local history_args=("${(@f)$(fc -ln "-$recent_command_count" | sed "$pad_starting_hypen_pattern")}")
+  local history_args=("${(@f)$(fc -ln "-$LLM_TOOLS_CLI_COMPLETION_RECENT_COMMAND_COUNT" \
+    | sed "$pad_starting_hypen_pattern")}")
 
   local suggestion=$(
     "$LLM_TOOLS_CLI_COMPLETION_COMMAND" \
