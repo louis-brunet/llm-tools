@@ -1,7 +1,5 @@
 import { Command, Option } from '@commander-js/extra-typings';
 import {
-  ILlmToolsClientConfigLlamaCpp,
-  ILlmToolsClientConfigOllama,
   LlamaCppModelEnum,
   LlmToolsBackendEnum,
   LlmToolsService,

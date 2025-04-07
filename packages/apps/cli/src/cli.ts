@@ -5,7 +5,7 @@ import { APP_CONFIG, ENVIRONMENT_CONFIG } from './config';
 
 const program = new Command()
   .name(APP_CONFIG.appName)
-  // .description('A CLI tool to infill commands using an LLM model')
+  .description('Interact with various LLMs from the command line')
   .version(APP_CONFIG.appVersion)
   .addOption(
     new Option('--debug', 'Enable debug logging')
@@ -14,10 +14,6 @@ const program = new Command()
   )
   .addCommand(infillCommand)
   .addCommand(cliCompletionCommand);
-//   .addHelpText(
-//     'after',
-//     ''
-//   );
 
 export type ProgramOptions = ReturnType<typeof program.opts>;
 
