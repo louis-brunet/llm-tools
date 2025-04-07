@@ -110,12 +110,15 @@ function "$LLM_TOOLS_WIDGET_NAME"() {
 }
 
 function _configure_llm_tools_widget() {
-  local _widget="$LLM_TOOLS_WIDGET_NAME"
-  local _widget_keybind="$LLM_TOOLS_WIDGET_KEYBIND"
+  local widget="$LLM_TOOLS_WIDGET_NAME"
+  local widget_keybind="$LLM_TOOLS_WIDGET_KEYBIND"
 
   # Bind widget
-  zle -N "$_widget"
-  bindkey "$_widget_keybind" "$_widget"
+  zle -N "$widget"
+  bindkey "$widget_keybind" "$widget"
+  bindkey -M emacs "$widget_keybind" "$widget"
+  bindkey -M viins "$widget_keybind" "$widget"
+  bindkey -M vicmd "$widget_keybind" "$widget"
 
   # # Print instructions
   # echo "Widget '$_widget' defined. Press $_widget_keybind to trigger completions."
@@ -160,5 +163,7 @@ _zsh_autosuggest_strategy_"$LLM_TOOLS_ZSH_AUTOSUGGESTIONS_STRATEGY"() {
 
 _llm_tools_script_path=$(realpath "$0")
 _llm_tools_script_dir=$(dirname "$_llm_tools_script_path")
+unset _llm_tools_script_path
+
 _configure_llm_tools_widget
 unset -f _configure_llm_tools_widget
