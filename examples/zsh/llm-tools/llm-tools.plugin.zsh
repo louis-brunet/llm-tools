@@ -77,7 +77,8 @@ _llm_tools_trigger_cli_completion() {
       --working-directory "$(pwd)" \
       --files "${files_args[@]}" \
       --recent-history "${history_args[@]}" \
-      --matched-history "${matching_commands[@]}"
+      --matched-history "${matching_commands[@]}" \
+      --shell zsh
   )
 
   echo "$suggestion"
