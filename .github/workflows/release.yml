@@ -1,5 +1,8 @@
 name: Create release
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
@@ -126,6 +129,7 @@ jobs:
       REGISTRY: ghcr.io
       IMAGE_NAME: ${{ github.repository }}-cli
       DOCKERFILE: ./docker/cli.Dockerfile
+      PUSH_TO_REGISTRY: ${{ github.event_name == 'push' && 'true' || 'false' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -162,7 +166,7 @@ jobs:
         with:
           context: .
           file: ${{ env.DOCKERFILE }}
-          push: true
+          push: ${{ env.PUSH_TO_REGISTRY }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: ${{ steps.build-arguments.outputs.build-args }}
@@ -172,10 +176,11 @@ jobs:
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
           subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
+          push-to-registry: ${{ env.PUSH_TO_REGISTRY }}
 
   publish_release:
     name: Publish release
+    if: github.event_name == 'push'
     needs:
       - setup
       - build_cli
