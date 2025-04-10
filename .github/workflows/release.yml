@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       app-version-suffix: ${{ steps.get-version.outputs.app-version-suffix }}
+      app-version: ${{ steps.get-version.outputs.app-version }}
       release-tag-name: ${{ steps.get-tag-name.outputs.release-tag-name }}
       is-prerelease: ${{ steps.get-tag-name.outputs.is-prerelease  }}
     steps:
